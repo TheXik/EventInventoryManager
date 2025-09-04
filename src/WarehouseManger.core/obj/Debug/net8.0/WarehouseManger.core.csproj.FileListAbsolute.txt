@@ -1,0 +1,12 @@
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/bin/Debug/net8.0/WarehouseManger.core.deps.json
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/bin/Debug/net8.0/WarehouseManger.core.dll
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/bin/Debug/net8.0/WarehouseManger.core.pdb
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/WarehouseManger.core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/WarehouseManger.core.AssemblyInfoInputs.cache
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/WarehouseManger.core.AssemblyInfo.cs
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/WarehouseManger.core.csproj.CoreCompileInputs.cache
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/WarehouseManger.core.sourcelink.json
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/WarehouseManger.core.dll
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/refint/WarehouseManger.core.dll
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/WarehouseManger.core.pdb
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/Debug/net8.0/ref/WarehouseManger.core.dll
