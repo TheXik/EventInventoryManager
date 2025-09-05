@@ -1,10 +1,8 @@
 /Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManager.Infrastructure.deps.json
 /Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManager.Infrastructure.dll
 /Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManager.Infrastructure.pdb
-/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManager.Application.dll
-/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManger.core.dll
-/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManager.Application.pdb
-/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManger.core.pdb
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManager.Core.dll
+/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/bin/Debug/net8.0/WarehouseManager.Core.pdb
 /Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/obj/Debug/net8.0/WarehouseManager.Infrastructure.csproj.AssemblyReference.cache
 /Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/obj/Debug/net8.0/WarehouseManager.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
 /Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/obj/Debug/net8.0/WarehouseManager.Infrastructure.AssemblyInfoInputs.cache

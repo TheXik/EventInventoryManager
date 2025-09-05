@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\WarehouseManger.core\WarehouseManger.core.csproj" />
+      <ProjectReference Include="..\WarehouseManager.Core\WarehouseManager.Core.csproj" />
     </ItemGroup>
 
 </Project>

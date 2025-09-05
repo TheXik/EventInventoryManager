@@ -22,20 +22,20 @@ main[b-94sdi3qsng] {
     align-items: center;
 }
 
-    .top-row[b-94sdi3qsng]  a, .top-row[b-94sdi3qsng]  .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
+.top-row[b-94sdi3qsng]  a, .top-row[b-94sdi3qsng]  .btn-link {
+    white-space: nowrap;
+    margin-left: 1.5rem;
+    text-decoration: none;
+}
 
-    .top-row[b-94sdi3qsng]  a:hover, .top-row[b-94sdi3qsng]  .btn-link:hover {
-        text-decoration: underline;
-    }
+.top-row[b-94sdi3qsng]  a:hover, .top-row[b-94sdi3qsng]  .btn-link:hover {
+    text-decoration: underline;
+}
 
-    .top-row[b-94sdi3qsng]  a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+.top-row[b-94sdi3qsng]  a:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 @media (max-width: 640.98px) {
     .top-row[b-94sdi3qsng] {
@@ -89,12 +89,12 @@ main[b-94sdi3qsng] {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss[b-94sdi3qsng] {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+#blazor-error-ui .dismiss[b-94sdi3qsng] {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
 /* _content/WarehouseManager.Web/Components/Layout/NavMenu.razor.rz.scp.css */
 .navbar-toggler[b-0kxywpaywg] {
     appearance: none;
@@ -115,7 +115,7 @@ main[b-94sdi3qsng] {
 
 .top-row[b-0kxywpaywg] {
     height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .navbar-brand[b-0kxywpaywg] {
@@ -169,33 +169,33 @@ main[b-94sdi3qsng] {
     padding-bottom: 0.5rem;
 }
 
-    .nav-item:first-of-type[b-0kxywpaywg] {
-        padding-top: 1rem;
-    }
+.nav-item:first-of-type[b-0kxywpaywg] {
+    padding-top: 1rem;
+}
 
-    .nav-item:last-of-type[b-0kxywpaywg] {
-        padding-bottom: 1rem;
-    }
+.nav-item:last-of-type[b-0kxywpaywg] {
+    padding-bottom: 1rem;
+}
 
-    .nav-item[b-0kxywpaywg]  .nav-link {
-        color: #d7d7d7;
-        background: none;
-        border: none;
-        border-radius: 4px;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        line-height: 3rem;
-        width: 100%;
-    }
+.nav-item[b-0kxywpaywg]  .nav-link {
+    color: #d7d7d7;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    line-height: 3rem;
+    width: 100%;
+}
 
 .nav-item[b-0kxywpaywg]  a.active {
-    background-color: rgba(255,255,255,0.37);
+    background-color: rgba(255, 255, 255, 0.37);
     color: white;
 }
 
 .nav-item[b-0kxywpaywg]  .nav-link:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     color: white;
 }
 

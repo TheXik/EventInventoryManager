@@ -4,14 +4,14 @@
     "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Infrastructure/WarehouseManager.Infrastructure.csproj": {}
   },
   "projects": {
-    "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Application/WarehouseManager.Application.csproj": {
+    "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Application/WarehouseManager.Application.csproj",
-        "projectName": "WarehouseManager.Application",
-        "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Application/WarehouseManager.Application.csproj",
+        "projectUniqueName": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj",
+        "projectName": "WarehouseManager.Core",
+        "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj",
         "packagesPath": "/Users/lukashellesch/.nuget/packages/",
-        "outputPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Application/obj/",
+        "outputPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/lukashellesch/.nuget/NuGet/NuGet.Config"
@@ -26,11 +26,7 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {
-              "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj": {
-                "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj"
-              }
-            }
+            "projectReferences": {}
           }
         },
         "warningProperties": {
@@ -47,6 +43,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Identity.Stores": {
+              "target": "Package",
+              "version": "[8.0.7, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -90,8 +92,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Application/WarehouseManager.Application.csproj": {
-                "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Application/WarehouseManager.Application.csproj"
+              "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj": {
+                "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj"
               }
             }
           }
@@ -111,70 +113,23 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.7, )"
+            },
+            "Microsoft.AspNetCore.Identity.UI": {
+              "target": "Package",
+              "version": "[8.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[8.0.7, )"
+            },
             "SendGrid": {
               "target": "Package",
               "version": "[9.29.3, )"
             }
           },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.413/PortableRuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj",
-        "projectName": "WarehouseManger.core",
-        "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj",
-        "packagesPath": "/Users/lukashellesch/.nuget/packages/",
-        "outputPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "/Users/lukashellesch/.nuget/NuGet/NuGet.Config"
-        ],
-        "originalTargetFrameworks": [
-          "net8.0"
-        ],
-        "sources": {
-          "/usr/local/share/dotnet/library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
-            "projectReferences": {}
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        }
-      },
-      "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
           "imports": [
             "net461",
             "net462",

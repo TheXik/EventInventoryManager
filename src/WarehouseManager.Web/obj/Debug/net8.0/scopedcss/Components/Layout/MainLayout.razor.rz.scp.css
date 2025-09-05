@@ -21,20 +21,20 @@ main[b-94sdi3qsng] {
     align-items: center;
 }
 
-    .top-row[b-94sdi3qsng]  a, .top-row[b-94sdi3qsng]  .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
+.top-row[b-94sdi3qsng]  a, .top-row[b-94sdi3qsng]  .btn-link {
+    white-space: nowrap;
+    margin-left: 1.5rem;
+    text-decoration: none;
+}
 
-    .top-row[b-94sdi3qsng]  a:hover, .top-row[b-94sdi3qsng]  .btn-link:hover {
-        text-decoration: underline;
-    }
+.top-row[b-94sdi3qsng]  a:hover, .top-row[b-94sdi3qsng]  .btn-link:hover {
+    text-decoration: underline;
+}
 
-    .top-row[b-94sdi3qsng]  a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+.top-row[b-94sdi3qsng]  a:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 @media (max-width: 640.98px) {
     .top-row[b-94sdi3qsng] {
@@ -88,9 +88,9 @@ main[b-94sdi3qsng] {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss[b-94sdi3qsng] {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+#blazor-error-ui .dismiss[b-94sdi3qsng] {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

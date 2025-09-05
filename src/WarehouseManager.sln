@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManger.core", "WarehouseManger.core\WarehouseManger.core.csproj", "{8EF256CE-1C46-46FD-A059-C84971078967}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManager.Core", "WarehouseManager.Core\WarehouseManager.Core.csproj", "{8EF256CE-1C46-46FD-A059-C84971078967}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManager.Application", "WarehouseManager.Application\WarehouseManager.Application.csproj", "{533758BD-BF49-4EC3-8EA3-B735A58497C6}"
 EndProject

@@ -27,8 +27,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj": {
-                "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj"
+              "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj": {
+                "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj"
               }
             }
           }
@@ -67,14 +67,14 @@
         }
       }
     },
-    "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj": {
+    "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj",
-        "projectName": "WarehouseManger.core",
-        "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/WarehouseManger.core.csproj",
+        "projectUniqueName": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj",
+        "projectName": "WarehouseManager.Core",
+        "projectPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/WarehouseManager.Core.csproj",
         "packagesPath": "/Users/lukashellesch/.nuget/packages/",
-        "outputPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManger.core/obj/",
+        "outputPath": "/Users/lukashellesch/Desktop/REPOS/EventInventoryManager/src/WarehouseManager.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/lukashellesch/.nuget/NuGet/NuGet.Config"
@@ -106,6 +106,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Identity.Stores": {
+              "target": "Package",
+              "version": "[8.0.7, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

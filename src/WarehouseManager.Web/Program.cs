@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WarehouseManager.Web.Components;
 using WarehouseManager.Web.Components.Account;
-using WarehouseManager.Web.Data;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using WarehouseManager.Core;
+using WarehouseManager.Infrastructure;
+using WarehouseManager.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +37,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration.GetSection("AuthMessageSenderOptions"));
+builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailSender>();
 
 var app = builder.Build();
 
