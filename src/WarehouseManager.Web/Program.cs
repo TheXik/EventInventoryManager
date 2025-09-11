@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WarehouseManager.Application.Interfaces;
+using WarehouseManager.Core;
+using WarehouseManager.Infrastructure.Data;
+using WarehouseManager.Infrastructure.Repositories;
+using WarehouseManager.Infrastructure.Services;
 using WarehouseManager.Web.Components;
 using WarehouseManager.Web.Components.Account;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using WarehouseManager.Core;
-using WarehouseManager.Infrastructure;
-using WarehouseManager.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,9 +38,13 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-
+// Services to send emails for authentication and password reset
 builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration.GetSection("AuthMessageSenderOptions"));
 builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailSender>();
+
+// Services for inventory management
+builder.Services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
+
 
 var app = builder.Build();
 
@@ -50,7 +55,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseExceptionHandler("/Error", true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
