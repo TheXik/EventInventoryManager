@@ -1,0 +1,190 @@
+@page "/inventory"
+@using WarehouseManager.Application.Interfaces
+@using WarehouseManager.Core.Entities
+@inject IInventoryItemRepository InventoryRepo
+
+<PageTitle>Inventory Dashboard</PageTitle>
+
+<div class="inventory-page-container">
+
+    @* TITLE AND ADD BUTTON *@
+    <div class="page-header">
+        <div class="page-header-title">
+            <h1>Manage Inventory</h1>
+            <p>Manage your warehouse equipment and stock</p>
+        </div>
+        <button class="btn btn-primary btn-add-item" @onclick="OpenAddModal">
+            <i class="fas fa-plus"></i>
+            <span>Add New Item</span>
+        </button>
+    </div>
+
+    @* SEARCH AND FILTER BOXES*@
+    <div class="page-toolbar">
+        <div class="toolbar-actions">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text"  class="form-control search-input"  placeholder="Search..."
+                       @bind="searchQuery" @bind:event="oninput"/>
+            </div>
+            <button class="btn btn-secondary btn-filter" @onclick="OpenFilterModal">
+                <i class="fas fa-filter"></i>
+                <span>Filter</span>
+            </button>
+        </div>
+    </div>
+    @* INVENTORY TABLE  *@
+    @if (allItems is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {   
+        <div>
+            <h3>
+                <i class="fas fa-box-archive"></i> <span>Inventory Items</span>
+            </h3>
+            <p>Complete list of warehouse equipment and their current status</p>
+        </div>
+        <div class="table-container">
+            <table class="inventory-table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in FilteredItems)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td class="text-center">@item.Quantity</td> @* TODO QUANTITY CALCULATES FROM AVAILIBLE *@
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+
+@* MODALS (Add and Filter) remain outside the main flow *@
+@if (isAddModalVisible)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Item</h2>
+                <button class="btn-close" @onclick="CloseAddModal"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="@newItem" OnValidSubmit="AddItem">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <InputText class="form-control" @bind-Value="newItem.Name" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <InputText class="form-control" @bind-Value="newItem.Description" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <InputNumber class="form-control" @bind-Value="newItem.Quantity" />
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseAddModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Item</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@if (isFilterModalVisible)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Filter Inventory</h2>
+                <button class="btn-close" @onclick="CloseFilterModal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Filter options will go here. (e.g., by category, availability, etc.)</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CloseFilterModal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="CloseFilterModal">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private List<InventoryItem>? allItems;
+    private string searchQuery = "";
+
+    // State for Modals 
+    private bool isAddModalVisible = false;
+    private bool isFilterModalVisible = false;
+    private InventoryItem newItem = new();
+    
+
+    // A computed property to display items based on search and filters
+    private IEnumerable<InventoryItem> FilteredItems =>
+        allItems?.Where(item =>
+            string.IsNullOrWhiteSpace(searchQuery) ||
+            item.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            item.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+        // TODO ADD WHERE for filters here later
+        ) ?? Enumerable.Empty<InventoryItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadItems();
+    }
+
+    private async Task LoadItems()
+    {
+        var items = await InventoryRepo.GetAllAsync();
+        allItems = items.ToList();
+    }
+
+    private async Task AddItem()
+    {
+        await InventoryRepo.AddAsync(newItem);
+        await LoadItems();
+        newItem = new();
+        CloseAddModal();
+    }
+
+    // Modal Controls
+    private void OpenAddModal() => isAddModalVisible = true;
+    private void CloseAddModal() => isAddModalVisible = false;
+    private void OpenFilterModal() => isFilterModalVisible = true;
+    private void CloseFilterModal() => isFilterModalVisible = false;
+}

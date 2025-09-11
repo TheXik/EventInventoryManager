@@ -12,6 +12,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7"/>
+        <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
     </ItemGroup>
 
     <ItemGroup>
@@ -21,6 +22,29 @@
 
     <ItemGroup>
       <Folder Include="Data\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\all.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\all.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\brands.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\brands.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\fontawesome.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\fontawesome.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\regular.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\regular.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\solid.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\solid.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\svg-with-js.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\svg-with-js.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\svg.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\svg.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v4-font-face.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v4-font-face.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v4-shims.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v4-shims.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v5-font-face.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v5-font-face.min.css" />
     </ItemGroup>
 
 </Project>
