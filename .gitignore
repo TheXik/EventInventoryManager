@@ -1,2 +1,43 @@
+# This file tells Git which files and folders to ignore in your project.
+# It's a standard configuration for .NET projects.
+
+## Visual Studio / Rider ##
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Build results ##
+[Bb]in/
+[Oo]bj/
+
+## Project state files ##
+project.fragment.lock.json
+project.lock.json
+
+## Runtime files ##
+appsettings.Development.json
+secrets.json
+
+## Database files ##
+# Ignore the local SQLite database file to prevent conflicts.
+# Each developer should have their own local database.
+*.db
+*.db-shm
+*.db-wal
+
+## Logs and temporary files ##
+[Ll]ogs/
+*.log
+*.tmp
+*.bak
+*.swp
+
+## OS generated files ##
 .DS_Store
-.idea
+Thumbs.db
+
+## User-specific files from other tools ##
+*.DotSettings.user
