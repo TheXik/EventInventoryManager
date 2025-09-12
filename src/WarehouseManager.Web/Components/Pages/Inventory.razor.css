@@ -1,5 +1,5 @@
 .inventory-page-container {
-    background-color: #f4f7fa; 
+    background-color: #f4f7fa;
     padding: 1.5rem;
 }
 
@@ -14,22 +14,19 @@
     margin-left: 0.5rem;
 }
 
-
 .page-toolbar {
     background-color: #fff;
     padding: 1rem 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
 }
 
 .toolbar-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
-    width: 100%; 
+    width: 100%;
 }
 
 .search-container {
@@ -46,24 +43,29 @@
 
 .search-input {
     padding-left: 30px;
-    width: 100%; 
+    width: 100%;
 }
 
 .btn-filter {
     padding: 0.375rem 0.75rem;
 }
 
-/* --- 3. Inventory Table Styles --- */
-.table-container {
+/* CORRECTED Inventory Table Styles */
+.page-inventory-table {
     background-color: #fff;
+    padding: 1rem 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    overflow: hidden; 
+    margin-bottom: 1.5rem;
+}
+
+.table-container {
+    overflow: hidden;
 }
 
 .inventory-table {
     width: 100%;
-    border-collapse: collapse; 
+    border-collapse: collapse;
 }
 
 .inventory-table th, .inventory-table td {
@@ -97,7 +99,7 @@
     gap: 0.5rem;
 }
 
-/* --- 4. Modal Styles (Unchanged) --- */
+/* Modal Styles */
 .modal-backdrop {
     position: fixed;
     top: 0;
