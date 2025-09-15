@@ -21,10 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\all.css" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\all.min.css" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\brands.css" />

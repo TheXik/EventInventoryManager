@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using EventInventoryManager.ViewModels 
 @using WarehouseManager.Core.Enums  
+@using WarehouseManager.Web.ViewModels
 
 @inject IInventoryItemRepository InventoryRepo
 @inject ICategoryRepository CategoryRepo 
@@ -87,7 +88,7 @@
                                         <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenItemDetailsModal(item)">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary">
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenEditItemModal(item)">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item)">
@@ -117,8 +118,6 @@
                 <div class="modal-body">
                     <EditForm Model="@_viewModel" OnValidSubmit="HandleValidSubmit">
                         <DataAnnotationsValidator />
-                        @* ... The rest of your form content stays exactly the same ... *@
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Name</label>
@@ -138,7 +137,7 @@
                         <div class="mb-3">
                             <label class="form-label">Category</label>
                             <InputSelect class="form-select" @bind-Value="_viewModel.CategoryId">
-                                <option value="0">-- Select a category --</option>
+                                @* The default "Uncategorized" value is set in the OpenAddModal method *@
                                 @foreach (var category in _categories)
                                 {
                                     <option value="@category.Id">@category.Name</option>
@@ -244,27 +243,77 @@
         </div>
     </div>
     
-    @* The backdrop is now a SIBLING to the modal div *@
     <div class="modal-backdrop fade show" @onclick="CloseAddModal"></div>
 }
+
 @* MODAL Filter) *@
 @if (_isFilterModalVisible)
 {
-    <div class="modal-backdrop">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Filter Inventory</h2>
-                <button class="btn-close" @onclick="CloseFilterModal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Filter options will go here.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @onclick="CloseFilterModal">Close</button>
-                <button type="button" class="btn btn-primary" @onclick="CloseFilterModal">Apply Filters</button>
+    <div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Filter Inventory</h5>
+                    <button type="button" class="btn-close" @onclick="CloseFilterModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Category</label>
+                        <div class="filter-checkbox-group">
+                            @foreach (var category in _categories.OrderBy(c => c.Name))
+                            {
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input"
+                                           id="cat-@category.Id"
+                                           checked="@_filters.SelectedCategoryIds.Contains(category.Id)"
+                                           @onchange="() => ToggleSelection(_filters.SelectedCategoryIds, category.Id)" />
+                                    <label class="form-check-label" for="cat-@category.Id">@category.Name</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Availability Status</label>
+                        <div class="filter-checkbox-group">
+                            @foreach (var status in Enum.GetValues<AvailabilityStatus>())
+                            {
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" 
+                                           id="status-@status"
+                                           checked="@_filters.SelectedAvailabilityStatuses.Contains(status)"
+                                           @onchange="() => ToggleSelection(_filters.SelectedAvailabilityStatuses, status)" />
+                                    <label class="form-check-label" for="status-@status">@status</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Condition</label>
+                        <div class="filter-checkbox-group">
+                             @foreach (var cond in Enum.GetValues<Condition>())
+                            {
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" 
+                                           id="cond-@cond"
+                                           checked="@_filters.SelectedConditions.Contains(cond)"
+                                           @onchange="() => ToggleSelection(_filters.SelectedConditions, cond)" />
+                                    <label class="form-check-label" for="cond-@cond">@cond</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" @onclick="ClearFilters">Clear Filters</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseFilterModal">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="ApplyFilters">Apply Filters</button>
+                </div>
             </div>
         </div>
     </div>
+    <div class="modal-backdrop fade show"></div>
 }
 
 
@@ -338,53 +387,226 @@
     </div>
     <div class="modal-backdrop fade show"></div>
 }
+
+
+
+@* ITEM EDIT MODAL *@
+@if (_isItemEditModalVisible && _selectedItem is not null)
+{
+    <div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit: @_viewModel.Name</h5>
+                    <button type="button" class="btn-close" @onclick="CloseEditItemModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@_viewModel" OnValidSubmit="HandleUpdateSubmit">
+                        <DataAnnotationsValidator />
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Name</label>
+                                <InputText class="form-control" @bind-Value="_viewModel.Name" />
+                                <ValidationMessage For="@(() => _viewModel.Name)" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Quantity</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Quantity" />
+                                <ValidationMessage For="@(() => _viewModel.Quantity)" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.Description" rows="3" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <InputSelect class="form-select" @bind-Value="_viewModel.CategoryId">
+                                @* We no longer need the "-- Select --" option here *@
+                                @foreach (var category in _categories)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => _viewModel.CategoryId)" />
+                        </div>
+
+                        <hr />
+                        <h5>Details</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Availability</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.AvailabilityStatus">
+                                    @foreach (var status in Enum.GetValues<AvailabilityStatus>())
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Condition</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.Condition">
+                                    <option value="">-- Not specified --</option>
+                                    @foreach (var cond in Enum.GetValues<Condition>())
+                                    {
+                                        <option value="@cond">@cond</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Loading Priority</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.TruckLoadingPriority">
+                                    <option value="">-- Not specified --</option>
+                                    @foreach (var priority in Enum.GetValues<TruckLoadingPriority>())
+                                    {
+                                        <option value="@priority">@priority</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Condition Description</label>
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.ConditionDescription" rows="2" />
+                        </div>
+
+                        <hr />
+                        <h5>Rental Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rental Status</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.RentalStatus">
+                                    @foreach (var status in Enum.GetValues<RentalStatus>())
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rental Price (€)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Rental Notes / Description</label>
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.RentalDescription" rows="2" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Weight (kg)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Weight" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Width (cm)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Width" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Height (cm)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Height" />
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CloseEditItemModal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+
+
 @code {
     private List<InventoryItem>? _allItems;
     private string _searchQuery = "";
     private bool _isAddModalVisible = false;
     private bool _isFilterModalVisible = false;
-    private bool _isItemDetailsModalVisible = false;  
-    private InventoryItem _newItem = new();
+    private bool _isItemDetailsModalVisible = false;
+    private bool _isItemEditModalVisible = false;
     private InventoryItem? _selectedItem; // To store the item being viewed
     private List<ItemCategory> _categories = new(); // For the dropdown
     private InventoryItemViewModel _viewModel = new();
-
     
+    private InventoryFilterViewModel _filters = new();
+    private IEnumerable<InventoryItem> FilteredItems
+    {
+        get
+        {
+            if (_allItems is null)
+            {
+                return Enumerable.Empty<InventoryItem>();
+            }
 
+            var query = _allItems.AsQueryable();
 
-    private IEnumerable<InventoryItem> FilteredItems =>
-        _allItems?.Where(item =>
-            string.IsNullOrWhiteSpace(_searchQuery) ||
-            item.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
-            item.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)
-        ) ?? Enumerable.Empty<InventoryItem>();
+            // 1. Text search filter (unchanged)
+            if (!string.IsNullOrWhiteSpace(_searchQuery))
+            {
+                query = query.Where(item =>
+                    item.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    (item.Description != null && item.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            // 2. Category multi-select filter
+            if (_filters.SelectedCategoryIds.Any())
+            {
+                query = query.Where(item => _filters.SelectedCategoryIds.Contains(item.CategoryId));
+            }
+
+            // 3. Availability Status multi-select filter
+            if (_filters.SelectedAvailabilityStatuses.Any())
+            {
+                // Note the check for nullable Condition property
+                query = query.Where(item => _filters.SelectedAvailabilityStatuses.Contains(item.AvailabilityStatus));
+            }
+            
+            // 4. Condition multi-select filter
+            if (_filters.SelectedConditions.Any())
+            {
+                query = query.Where(item => item.Condition.HasValue && _filters.SelectedConditions.Contains(item.Condition.Value));
+            }
+            
+            return query.ToList();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
     }
   
-    private void OpenAddModal()
-    {
-        // Reset the view model to ensure a clean form
-        _viewModel = new InventoryItemViewModel();
-        _isAddModalVisible = true;
-    }
     private async Task LoadData()
     {
+        // Get all data from the database
         var itemsTask = InventoryRepo.GetAllAsync();
         var categoriesTask = CategoryRepo.GetAllAsync();
-
         await Task.WhenAll(itemsTask, categoriesTask);
 
         _allItems = (await itemsTask).ToList();
         _categories = (await categoriesTask).ToList(); 
     }
     
-    private void CloseAddModal() => _isAddModalVisible = false;
-    private void OpenFilterModal() => _isFilterModalVisible = true;
-    private void CloseFilterModal() => _isFilterModalVisible = false;
-    
+    private void ToggleSelection<T>(HashSet<T> set, T value)
+    {
+        if (set.Contains(value))
+        {
+            set.Remove(value);
+        }
+        else
+        {
+            set.Add(value);
+        }
+    }
     
     private async Task HandleValidSubmit()
     {
@@ -392,22 +614,21 @@
         {
             if (string.IsNullOrWhiteSpace(_viewModel.NewCategoryName))
             {
-                // TODO ADD errror validation
+                // TODO: Add a proper validation message to the UI
                 return;
             }
 
             var newCategory = new ItemCategory { Name = _viewModel.NewCategoryName };
             var createdCategory = await CategoryRepo.AddAsync(newCategory);
-            _viewModel.CategoryId = createdCategory.Id; // Update the ViewModel with the new ID
+            _viewModel.CategoryId = createdCategory.Id;
         }
 
-        // Step 2: Map the ViewModel to the database entity
         var newItem = new InventoryItem
         {
             Name = _viewModel.Name,
             Description = _viewModel.Description,
             Quantity = _viewModel.Quantity,
-            CategoryId = _viewModel.CategoryId, // Assign the foreign key
+            CategoryId = _viewModel.CategoryId,
             AvailabilityStatus = _viewModel.AvailabilityStatus,
             Weight = _viewModel.Weight,
             Height = _viewModel.Height,
@@ -415,19 +636,72 @@
             TruckLoadingPriority = _viewModel.TruckLoadingPriority,
             RentalStatus = _viewModel.RentalStatus,
             RentalDate = _viewModel.RentalDate ?? DateTime.UtcNow,
-            RentalPrice = (int)_viewModel.RentalPrice, // Cast from decimal if needed
+            RentalPrice = (int)_viewModel.RentalPrice,
             Condition = _viewModel.Condition,
             ConditionDescription = _viewModel.ConditionDescription
         };
 
-        // Step 3: Save the new item to the database
         await InventoryRepo.AddAsync(newItem);
 
-        // Step 4: Refresh data and close modal
-        await LoadData(); // Reloads both items and categories
+        await LoadData();
         CloseAddModal();
     }
 
+    private async Task HandleUpdateSubmit()
+    {
+        var itemToUpdate = _allItems?.FirstOrDefault(i => i.Id == _viewModel.Id);
+        if (itemToUpdate is null)
+        {
+            // TODO: Handle error - item not found
+            return;
+        }
+
+        itemToUpdate.Name = _viewModel.Name;
+        itemToUpdate.Description = _viewModel.Description;
+        itemToUpdate.Quantity = _viewModel.Quantity;
+        itemToUpdate.CategoryId = _viewModel.CategoryId;
+        itemToUpdate.AvailabilityStatus = _viewModel.AvailabilityStatus;
+        itemToUpdate.Weight = _viewModel.Weight;
+        itemToUpdate.Height = _viewModel.Height;
+        itemToUpdate.Width = _viewModel.Width;
+        itemToUpdate.TruckLoadingPriority = _viewModel.TruckLoadingPriority;
+        itemToUpdate.RentalStatus = _viewModel.RentalStatus;
+        itemToUpdate.RentalPrice = (int)_viewModel.RentalPrice;
+        itemToUpdate.Condition = _viewModel.Condition;
+        itemToUpdate.ConditionDescription = _viewModel.ConditionDescription;
+
+        await InventoryRepo.UpdateAsync(itemToUpdate);
+
+        await LoadData();
+        CloseEditItemModal();
+    }
+
+    private async Task DeleteItem(InventoryItem item)
+    {
+        await InventoryRepo.DeleteAsync(item.Id);
+        await LoadData();
+    }
+    
+    // MODAL OPENING AND CLOSING FUNCTIONS
+    private void OpenAddModal()
+    {
+        var uncategorized = _categories.FirstOrDefault(c => c.Name == "Uncategorized");
+        int defaultCategoryId = uncategorized?.Id ?? 1;
+
+        _viewModel = new InventoryItemViewModel
+        {
+            CategoryId = defaultCategoryId
+        };
+    
+        _isAddModalVisible = true;
+    }
+
+    private void CloseAddModal() => _isAddModalVisible = false;
+    
+    private void OpenFilterModal() => _isFilterModalVisible = true;
+    
+    private void CloseFilterModal() => _isFilterModalVisible = false;
+    
     private void OpenItemDetailsModal(InventoryItem item)
     {
         _selectedItem = item;
@@ -439,11 +713,46 @@
         _isItemDetailsModalVisible = false;
         _selectedItem = null;
     }
-
-    private async Task DeleteItem(InventoryItem item)
+    
+    private void OpenEditItemModal(InventoryItem item)
     {
-        await InventoryRepo.DeleteAsync(item.Id);
-        await LoadData();
+        _selectedItem = item;
+        
+        _viewModel = new InventoryItemViewModel
+        {
+            Id = item.Id,
+            Name = item.Name,
+            Description = item.Description,
+            Quantity = item.Quantity,
+            CategoryId = item.CategoryId,
+            AvailabilityStatus = item.AvailabilityStatus,
+            Weight = item.Weight,
+            Height = item.Height,
+            Width = item.Width,
+            TruckLoadingPriority = item.TruckLoadingPriority,
+            RentalStatus = item.RentalStatus,
+            RentalPrice = item.RentalPrice,
+            Condition = item.Condition,
+            ConditionDescription = item.ConditionDescription
+        };
+
+        _isItemEditModalVisible = true;
     }
 
+    private void CloseEditItemModal()
+    {
+        _isItemEditModalVisible = false;
+        _selectedItem = null;
+    }
+    
+    private void ApplyFilters()
+    {
+        CloseFilterModal();
+    }
+
+    private void ClearFilters()
+    {
+        _filters = new InventoryFilterViewModel();
+        CloseFilterModal();
+    }
 }

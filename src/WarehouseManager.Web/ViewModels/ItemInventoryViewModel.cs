@@ -21,6 +21,7 @@ public class InventoryItemViewModel
     public int Quantity { get; set; }
 
     public int CategoryId { get; set; }
+
     
     // This property is only used if the user wants to create a new category
     public string? NewCategoryName { get; set; }
