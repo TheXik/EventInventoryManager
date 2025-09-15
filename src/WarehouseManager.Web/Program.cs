@@ -45,6 +45,8 @@ builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailSender>();
 // Services for inventory management
 builder.Services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
 
+// Category service handled
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 

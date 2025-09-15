@@ -1,7 +1,16 @@
 @page "/inventory"
 @using WarehouseManager.Application.Interfaces
 @using WarehouseManager.Core.Entities
+@using Microsoft.AspNetCore.Authorization
+@using EventInventoryManager.ViewModels 
+@using WarehouseManager.Core.Enums  
+
 @inject IInventoryItemRepository InventoryRepo
+@inject ICategoryRepository CategoryRepo 
+
+
+
+@attribute [Authorize]
 
 <PageTitle>Inventory Dashboard</PageTitle>
 
@@ -10,7 +19,7 @@
     @* TITLE AND ADD BUTTON *@
     <div class="page-header">
         <div class="page-header-title">
-            <h1>Manage Inventory</h1>
+            <h1 class="primary-text">Manage Inventory</h1>
             <p>Manage your warehouse equipment and stock</p>
         </div>
         <button class="btn btn-primary btn-add-item" @onclick="OpenAddModal">
@@ -25,7 +34,7 @@
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="form-control search-input" placeholder="Search..."
-                       @bind="searchQuery" @bind:event="oninput"/>
+                       @bind="_searchQuery" @bind:event="oninput"/>
             </div>
             <button class="btn btn-secondary btn-filter" @onclick="OpenFilterModal">
                 <i class="fas fa-filter"></i>
@@ -35,7 +44,7 @@
     </div>
     
     @* INVENTORY TABLE *@
-    @if (allItems is null)
+    @if (_allItems is null)
     {
         <p><em>Loading...</em></p>
     }
@@ -56,6 +65,10 @@
                             <th>Description</th>
                             <th class="text-center">Quantity</th>
                             <th class="text-right">Actions</th>
+                            <th>Category </th>
+                            <th>Availability Status</th>
+                            <th>Rental Status</th>
+                            <th>Condition</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -64,16 +77,20 @@
                             <tr>
                                 <td>@item.Name</td>
                                 <td>@item.Description</td>
-                                <td class="text-center">@item.Quantity</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Category?.Name</td>
+                                <td>@item.AvailabilityStatus</td>
+                                <td>@item.RentalStatus</td>
+                                <td>@item.Condition</td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-secondary">
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenItemDetailsModal(item)">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
                                         <button class="btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger">
+                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item)">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </div>
@@ -87,43 +104,151 @@
     }
 </div>
 
-@* MODALS (Add and Filter) *@
-@if (isAddModalVisible)
+@* MODAL Add *@
+@if (_isAddModalVisible)
 {
-    <div class="modal-backdrop">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Item</h2>
-                <button class="btn-close" @onclick="CloseAddModal"></button>
-            </div>
-            <div class="modal-body">
-                <EditForm Model="@newItem" OnValidSubmit="AddItem">
-                    <DataAnnotationsValidator/>
-                    <ValidationSummary/>
+    <div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Inventory Item</h5>
+                    <button type="button" class="btn-close" @onclick="CloseAddModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@_viewModel" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+                        @* ... The rest of your form content stays exactly the same ... *@
 
-                    <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <InputText class="form-control" @bind-Value="newItem.Name"/>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <InputText class="form-control" @bind-Value="newItem.Description"/>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Quantity</label>
-                        <InputNumber class="form-control" @bind-Value="newItem.Quantity"/>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @onclick="CloseAddModal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Item</button>
-                    </div>
-                </EditForm>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Name</label>
+                                <InputText class="form-control" @bind-Value="_viewModel.Name" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Quantity</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Quantity" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.Description" rows="3" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <InputSelect class="form-select" @bind-Value="_viewModel.CategoryId">
+                                <option value="0">-- Select a category --</option>
+                                @foreach (var category in _categories)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                                <option value="-1">** Create a new category **</option>
+                            </InputSelect>
+                        </div>
+
+                        @if (_viewModel.CategoryId == -1)
+                        {
+                            <div class="mb-3 p-3 bg-light border rounded">
+                                <label class="form-label">New Category Name</label>
+                                <InputText class="form-control" @bind-Value="_viewModel.NewCategoryName" placeholder="e.g., Lighting, Audio, Cables" />
+                            </div>
+                        }
+
+                        <hr />
+                        <h5>Details</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Availability</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.AvailabilityStatus">
+                                    @foreach (var status in Enum.GetValues<AvailabilityStatus>())
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Condition</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.Condition">
+                                    <option value="">-- Not specified --</option>
+                                    @foreach (var cond in Enum.GetValues<Condition>())
+                                    {
+                                        <option value="@cond">@cond</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Loading Priority</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.TruckLoadingPriority">
+                                    <option value="">-- Not specified --</option>
+                                    @foreach (var priority in Enum.GetValues<TruckLoadingPriority>())
+                                    {
+                                        <option value="@priority">@priority</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Condition Description</label>
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.ConditionDescription" rows="2" />
+                        </div>
+
+                        <hr />
+                        <h5>Rental Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rental Status</label>
+                                <InputSelect class="form-select" @bind-Value="_viewModel.RentalStatus">
+                                    @foreach (var status in Enum.GetValues<RentalStatus>())
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rental Price (€)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Rental Notes / Description</label>
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.RentalDescription" rows="2" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Weight (kg)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Weight" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Width (cm)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Width" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Height (cm)</label>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Height" />
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CloseAddModal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Item</button>
+                        </div>
+                    </EditForm>
+                </div>
             </div>
         </div>
     </div>
+    
+    @* The backdrop is now a SIBLING to the modal div *@
+    <div class="modal-backdrop fade show" @onclick="CloseAddModal"></div>
 }
-
-@if (isFilterModalVisible)
+@* MODAL Filter) *@
+@if (_isFilterModalVisible)
 {
     <div class="modal-backdrop">
         <div class="modal-content">
@@ -142,40 +267,183 @@
     </div>
 }
 
+
+@* ITEM DETAILS MODAL *@
+@if (_isItemDetailsModalVisible && _selectedItem is not null)
+{
+    <div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Item Details: @_selectedItem.Name</h5>
+                    <button type="button" class="btn-close" @onclick="CloseItemDetailsModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Description</strong>
+                            <p>@(_selectedItem.Description ?? "N/A")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Category</strong>
+                            <p>@(_selectedItem.Category?.Name ?? "Uncategorized")</p>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong>Quantity</strong>
+                            <p>@_selectedItem.Quantity</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Availability</strong>
+                            <p>@_selectedItem.AvailabilityStatus</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Condition</strong>
+                            <p>@(_selectedItem.Condition?.ToString() ?? "Not specified")</p>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(_selectedItem.ConditionDescription))
+                    {
+                        <strong>Condition Notes</strong>
+                        <p>@_selectedItem.ConditionDescription</p>
+                    }
+                    <hr />
+                    <h5>Dimensions & Logistics</h5>
+                    <div class="row">
+                        <div class="col-md-3"><strong>Weight:</strong> @(_selectedItem.Weight) kg</div>
+                        <div class="col-md-3"><strong>Width:</strong> @(_selectedItem.Width) cm</div>
+                        <div class="col-md-3"><strong>Height:</strong> @(_selectedItem.Height) cm</div>
+                        <div class="col-md-3"><strong>Load Priority:</strong> @(_selectedItem.TruckLoadingPriority?.ToString() ?? "N/A")</div>
+                    </div>
+                    <hr />
+                    <h5>Rental Information</h5>
+                    <div class="row">
+                        <div class="col-md-4"><strong>Rental Status:</strong> @_selectedItem.RentalStatus</div>
+                        <div class="col-md-4"><strong>Rental Price:</strong> @_selectedItem.RentalPrice.ToString("C")</div>
+                        <div class="col-md-4"><strong>Last Rental:</strong> @_selectedItem.RentalDate.ToShortDateString()</div>
+                    </div>
+                     @if (!string.IsNullOrWhiteSpace(_selectedItem.RentalDescription))
+                    {
+                        <strong>Rental Notes</strong>
+                        <p>@_selectedItem.RentalDescription</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseItemDetailsModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
 @code {
-    private List<InventoryItem>? allItems;
-    private string searchQuery = "";
-    private bool isAddModalVisible = false;
-    private bool isFilterModalVisible = false;
-    private InventoryItem newItem = new();
+    private List<InventoryItem>? _allItems;
+    private string _searchQuery = "";
+    private bool _isAddModalVisible = false;
+    private bool _isFilterModalVisible = false;
+    private bool _isItemDetailsModalVisible = false;  
+    private InventoryItem _newItem = new();
+    private InventoryItem? _selectedItem; // To store the item being viewed
+    private List<ItemCategory> _categories = new(); // For the dropdown
+    private InventoryItemViewModel _viewModel = new();
+
+    
+
 
     private IEnumerable<InventoryItem> FilteredItems =>
-        allItems?.Where(item =>
-            string.IsNullOrWhiteSpace(searchQuery) ||
-            item.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-            item.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+        _allItems?.Where(item =>
+            string.IsNullOrWhiteSpace(_searchQuery) ||
+            item.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            item.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)
         ) ?? Enumerable.Empty<InventoryItem>();
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadItems();
+        await LoadData();
     }
-
-    private async Task LoadItems()
+  
+    private void OpenAddModal()
     {
-        allItems = (await InventoryRepo.GetAllAsync()).ToList();
+        // Reset the view model to ensure a clean form
+        _viewModel = new InventoryItemViewModel();
+        _isAddModalVisible = true;
     }
-
-    private async Task AddItem()
+    private async Task LoadData()
     {
+        var itemsTask = InventoryRepo.GetAllAsync();
+        var categoriesTask = CategoryRepo.GetAllAsync();
+
+        await Task.WhenAll(itemsTask, categoriesTask);
+
+        _allItems = (await itemsTask).ToList();
+        _categories = (await categoriesTask).ToList(); 
+    }
+    
+    private void CloseAddModal() => _isAddModalVisible = false;
+    private void OpenFilterModal() => _isFilterModalVisible = true;
+    private void CloseFilterModal() => _isFilterModalVisible = false;
+    
+    
+    private async Task HandleValidSubmit()
+    {
+        if (_viewModel.CategoryId == -1)
+        {
+            if (string.IsNullOrWhiteSpace(_viewModel.NewCategoryName))
+            {
+                // TODO ADD errror validation
+                return;
+            }
+
+            var newCategory = new ItemCategory { Name = _viewModel.NewCategoryName };
+            var createdCategory = await CategoryRepo.AddAsync(newCategory);
+            _viewModel.CategoryId = createdCategory.Id; // Update the ViewModel with the new ID
+        }
+
+        // Step 2: Map the ViewModel to the database entity
+        var newItem = new InventoryItem
+        {
+            Name = _viewModel.Name,
+            Description = _viewModel.Description,
+            Quantity = _viewModel.Quantity,
+            CategoryId = _viewModel.CategoryId, // Assign the foreign key
+            AvailabilityStatus = _viewModel.AvailabilityStatus,
+            Weight = _viewModel.Weight,
+            Height = _viewModel.Height,
+            Width = _viewModel.Width,
+            TruckLoadingPriority = _viewModel.TruckLoadingPriority,
+            RentalStatus = _viewModel.RentalStatus,
+            RentalDate = _viewModel.RentalDate ?? DateTime.UtcNow,
+            RentalPrice = (int)_viewModel.RentalPrice, // Cast from decimal if needed
+            Condition = _viewModel.Condition,
+            ConditionDescription = _viewModel.ConditionDescription
+        };
+
+        // Step 3: Save the new item to the database
         await InventoryRepo.AddAsync(newItem);
-        await LoadItems();
-        newItem = new();
+
+        // Step 4: Refresh data and close modal
+        await LoadData(); // Reloads both items and categories
         CloseAddModal();
     }
 
-    private void OpenAddModal() => isAddModalVisible = true;
-    private void CloseAddModal() => isAddModalVisible = false;
-    private void OpenFilterModal() => isFilterModalVisible = true;
-    private void CloseFilterModal() => isFilterModalVisible = false;
+    private void OpenItemDetailsModal(InventoryItem item)
+    {
+        _selectedItem = item;
+        _isItemDetailsModalVisible = true;
+    }
+
+    private void CloseItemDetailsModal()
+    {
+        _isItemDetailsModalVisible = false;
+        _selectedItem = null;
+    }
+
+    private async Task DeleteItem(InventoryItem item)
+    {
+        await InventoryRepo.DeleteAsync(item.Id);
+        await LoadData();
+    }
+
 }

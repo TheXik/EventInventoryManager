@@ -1,0 +1,25 @@
+
+@page "/"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Welcome</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        @{
+            // If the user is logged in, don't show the welcome page.
+            // Immediately redirect them to their dashboard.
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="text-center p-4">
+            <h1 class="display-4">Event Inventory Manager</h1>
+            <p class="lead">The complete solution for managing your event company's warehouse inventory.</p>
+            <hr class="my-4">
+            <p>Please log in to continue or register for a new account.</p>
+            <a class="btn btn-primary btn-lg" href="Account/Login" role="button">Login</a>
+            <a class="btn btn-success btn-lg" href="Account/Register" role="button">Register</a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>

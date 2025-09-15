@@ -6,5 +6,6 @@ public enum RentalStatus
     Rented,
     Reserved,
     Damaged,
-    Lost
+    Lost,
+    NotInRentalUse
 }
