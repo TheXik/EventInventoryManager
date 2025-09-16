@@ -1,4 +1,4 @@
-namespace WarehouseManager.Core.Entities;
+namespace WarehouseManager.Core.Entities.InventoryPage;
 
 public class ItemCategory
 {

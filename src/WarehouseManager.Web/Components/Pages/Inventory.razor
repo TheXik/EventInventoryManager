@@ -1,8 +1,8 @@
 @page "/inventory"
 @using WarehouseManager.Application.Interfaces
-@using WarehouseManager.Core.Entities
 @using Microsoft.AspNetCore.Authorization
 @using EventInventoryManager.ViewModels 
+@using WarehouseManager.Core.Entities.InventoryPage
 @using WarehouseManager.Core.Enums  
 @using WarehouseManager.Web.ViewModels
 
@@ -59,45 +59,49 @@
                 <p>Complete list of warehouse equipment and their current status</p>
             </div>
             <div class="table-container">
-                <table class="inventory-table">
+                <table class="inventory-table align-middle">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Description</th>
                             <th class="text-center">Quantity</th>
+                            <th class="text-center">Category </th>
+                            <th class="text-center" >Availability Status</th>
+                            <th class="text-center">Rental Status</th>
+                            <th class="text-center">Condition</th>
                             <th class="text-right">Actions</th>
-                            <th>Category </th>
-                            <th>Availability Status</th>
-                            <th>Rental Status</th>
-                            <th>Condition</th>
+
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in FilteredItems)
-                        {
-                            <tr>
-                                <td>@item.Name</td>
-                                <td>@item.Description</td>
-                                <td>@item.Quantity</td>
-                                <td>@item.Category?.Name</td>
-                                <td>@item.AvailabilityStatus</td>
-                                <td>@item.RentalStatus</td>
-                                <td>@item.Condition</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenItemDetailsModal(item)">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenEditItemModal(item)">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item)">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
+                    @foreach (var item in FilteredItems)
+                    {
+                        <tr>
+                            <td >@item.Name</td>
+                            <td class="text-center">@item.Quantity</td>
+                            
+                            <td class="text-center" >@item.Category.Name</td>
+                            <td class="text-center" >
+                                <span class="@GetStatusBadgeClass(item.AvailabilityStatus)" >@item.AvailabilityStatus</span>
+                            </td>
+                            <td class="text-center" >@item.RentalStatus</td>
+                            <td class="text-center">
+                                <span class="@GetConditionBadgeClass(item.Condition)">@item.Condition</span>
+                            </td>
+                            <td class="text-right">
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenItemDetailsModal(item)">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenEditItemModal(item)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                     </tbody>
                 </table>
             </div>
@@ -335,7 +339,7 @@
                         </div>
                         <div class="col-md-6">
                             <strong>Category</strong>
-                            <p>@(_selectedItem.Category?.Name ?? "Uncategorized")</p>
+                            <p>@_selectedItem.Category.Name</p>
                         </div>
                     </div>
                     <hr />
@@ -529,10 +533,10 @@
 @code {
     private List<InventoryItem>? _allItems;
     private string _searchQuery = "";
-    private bool _isAddModalVisible = false;
-    private bool _isFilterModalVisible = false;
-    private bool _isItemDetailsModalVisible = false;
-    private bool _isItemEditModalVisible = false;
+    private bool _isAddModalVisible;
+    private bool _isFilterModalVisible;
+    private bool _isItemDetailsModalVisible;
+    private bool _isItemEditModalVisible;
     private InventoryItem? _selectedItem; // To store the item being viewed
     private List<ItemCategory> _categories = new(); // For the dropdown
     private InventoryItemViewModel _viewModel = new();
@@ -633,7 +637,8 @@
             RentalDate = _viewModel.RentalDate ?? DateTime.UtcNow,
             RentalPrice = (int)_viewModel.RentalPrice,
             Condition = _viewModel.Condition,
-            ConditionDescription = _viewModel.ConditionDescription
+            ConditionDescription = _viewModel.ConditionDescription,
+            Category = null
         };
 
         await InventoryRepo.AddAsync(newItem);
@@ -750,4 +755,32 @@
         _filters = new InventoryFilterViewModel();
         CloseFilterModal();
     }
+    
+    private string GetConditionBadgeClass(Condition? condition)
+    {
+        // Ak je hodnota null, vrátime defaultnú sivú farbu
+        if (!condition.HasValue)
+        {
+            return "badge bg-secondary";
+        }
+
+        return condition.Value switch
+        {
+            Condition.New => "badge bg-success",
+            Condition.Damaged => "badge bg-warning text-dark",
+            Condition.Lost => "badge bg-danger",
+            _ => "badge bg-secondary"
+        };
+    }
+
+    private string GetStatusBadgeClass(AvailabilityStatus status)
+    {
+        return status switch
+        {
+            AvailabilityStatus.Available => "badge bg-success",
+            AvailabilityStatus.Unavailable => "badge bg-danger",
+            _ => "badge bg-secondary"
+        };
+    }
+    
 }

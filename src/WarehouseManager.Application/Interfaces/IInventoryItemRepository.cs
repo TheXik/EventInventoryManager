@@ -1,4 +1,5 @@
 using WarehouseManager.Core.Entities;
+using WarehouseManager.Core.Entities.InventoryPage;
 
 namespace WarehouseManager.Application.Interfaces;
 

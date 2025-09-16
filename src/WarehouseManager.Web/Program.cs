@@ -48,6 +48,9 @@ builder.Services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
 // Category service handled
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+// Event service
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

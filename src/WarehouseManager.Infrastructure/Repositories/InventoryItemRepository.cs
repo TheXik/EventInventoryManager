@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WarehouseManager.Application.Interfaces;
 using WarehouseManager.Core.Entities;
+using WarehouseManager.Core.Entities.InventoryPage;
 using WarehouseManager.Infrastructure.Data;
 
 namespace WarehouseManager.Infrastructure.Repositories;
