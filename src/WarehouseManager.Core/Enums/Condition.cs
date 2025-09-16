@@ -2,7 +2,7 @@ namespace WarehouseManager.Core.Enums;
 
 public enum Condition
 {
-    Okay,
+    New,
     Damaged,
     Lost
 }
