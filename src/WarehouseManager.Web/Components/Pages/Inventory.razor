@@ -549,7 +549,6 @@
 
             var query = _allItems.AsQueryable();
 
-            // 1. Text search filter (unchanged)
             if (!string.IsNullOrWhiteSpace(_searchQuery))
             {
                 query = query.Where(item =>
@@ -557,20 +556,16 @@
                     (item.Description != null && item.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)));
             }
 
-            // 2. Category multi-select filter
             if (_filters.SelectedCategoryIds.Any())
             {
                 query = query.Where(item => _filters.SelectedCategoryIds.Contains(item.CategoryId));
             }
 
-            // 3. Availability Status multi-select filter
             if (_filters.SelectedAvailabilityStatuses.Any())
             {
-                // Note the check for nullable Condition property
                 query = query.Where(item => _filters.SelectedAvailabilityStatuses.Contains(item.AvailabilityStatus));
             }
             
-            // 4. Condition multi-select filter
             if (_filters.SelectedConditions.Any())
             {
                 query = query.Where(item => item.Condition.HasValue && _filters.SelectedConditions.Contains(item.Condition.Value));

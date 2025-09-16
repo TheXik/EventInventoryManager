@@ -41,6 +41,8 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v4-shims.min.css" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v5-font-face.css" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\font-awesome\css\v5-font-face.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\inventory.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
     </ItemGroup>
 
 </Project>
