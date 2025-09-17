@@ -215,7 +215,16 @@ namespace WarehouseManager.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Category")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClientName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Color")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("EndDate")
@@ -226,6 +235,9 @@ namespace WarehouseManager.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RecurrenceRule")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("StartDate")

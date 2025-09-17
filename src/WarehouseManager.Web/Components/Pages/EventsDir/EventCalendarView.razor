@@ -1,0 +1,25 @@
+
+@using WarehouseManager.Core.Entities
+
+@if (Events == null)
+{
+    <p><em>Loading calendar...</em></p>
+}
+else
+{
+    <RadzenScheduler @ref="_scheduler" TItem="Event" Data="@Events"
+                     TextProperty="Name" StartProperty="StartDate" EndProperty="EndDate"
+                     Style="height: 80vh;"
+                     
+                     SlotSelect=@(args => OnSlotSelect(args))
+                     AppointmentSelect=@(args => OnAppointmentSelect(args))
+                     AppointmentMove=@(args => OnAppointmentMove(args))
+                     
+                     AppointmentRender=@OnAppointmentRender>
+        
+        <RadzenWeekView />
+        <RadzenMonthView />
+        <RadzenDayView />
+        <RadzenAgendaView />
+    </RadzenScheduler>
+}

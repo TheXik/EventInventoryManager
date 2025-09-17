@@ -1,0 +1,9 @@
+.form-control-color {
+    max-width: 100px;
+    height: calc(1.5em + .75rem + 2px); 
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding-top: 1rem;
+}

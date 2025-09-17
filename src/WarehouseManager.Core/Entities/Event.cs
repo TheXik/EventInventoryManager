@@ -13,7 +13,11 @@ public class Event
     public string? Location { get; set; }
 
 
+    public string? Description { get; set; }
+    public string? Category { get; set; }
+    public string? Color { get; set; } 
+    public string? RecurrenceRule { get; set; } 
+    
     public EventStatus eventStatus { get; set; }
-
     public List<InventoryItem> ItemsNeeded { get; set; } = new();
 }

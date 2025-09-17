@@ -1,6 +1,32 @@
-@page "/Events"
-<h3>Events</h3>
+@page "/events"
+@using Microsoft.AspNetCore.Authorization
 
-@code {
-    
-}
+@attribute [Authorize]
+
+<div class="events-page">
+    <div class="view-toggle">
+        <h3>My Events</h3>
+        <div>
+            <button class="btn @(isCalendarView ? "btn-secondary" : "btn-primary")" @onclick="() => isCalendarView = false">
+                <i class="fas fa-list"></i> List View
+            </button>
+            <button class="btn @(isCalendarView ? "btn-primary" : "btn-secondary")" @onclick="() => isCalendarView = true">
+                <i class="fas fa-calendar-alt"></i> Calendar View
+            </button>
+        </div>
+    </div>
+
+    @if (isCalendarView)
+    {
+        <EventCalendarView Events="_events" OnEventClick="EditEvent" OnDateSelect="AddNewEvent" OnEventUpdate="HandleEventUpdate"/>
+    }
+    else
+    {
+        <EventListView Events="_events" OnEditClick="EditEvent" OnDeleteClick="DeleteEvent"/>
+        <button class="fab" @onclick="() => AddNewEvent(DateTime.Now)">
+            +
+        </button>
+    }
+</div>
+
+<EventForm @ref="_eventForm" OnSave="HandleSaveEvent" />
