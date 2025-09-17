@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Radzen;
 using WarehouseManager.Application.Interfaces;
 using WarehouseManager.Core;
 using WarehouseManager.Infrastructure.Data;
@@ -50,6 +51,9 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 // Event service
 builder.Services.AddScoped<IEventRepository, EventRepository>();
+
+builder.Services.AddRadzenComponents();
+
 
 var app = builder.Build();
 

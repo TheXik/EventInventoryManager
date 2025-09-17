@@ -1,15 +1,19 @@
 using WarehouseManager.Core.Entities.InventoryPage;
+using WarehouseManager.Core.Enums;
 
 namespace WarehouseManager.Core.Entities;
 
 public class Event
 {
     public int Id { get; set; }
-    public required string Name { get; set; }
-    public DateTime From { get; set; }
-    public DateTime To { get; set; }
+    public string Name { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public string? ClientName { get; set; }
     public string? Location { get; set; }
-    
+
+
+    public EventStatus eventStatus { get; set; }
+
     public List<InventoryItem> ItemsNeeded { get; set; } = new();
 }

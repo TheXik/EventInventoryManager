@@ -1,0 +1,17 @@
+@page "/CalendarView"
+@using WarehouseManager.Core.Entities
+
+<h3>CalendarView</h3>
+
+<RadzenScheduler @ref="scheduler"
+                 TItem="Event"
+                 Data="@events"
+                 StartProperty="StartDate"
+                 EndProperty="EndDate"
+                 TextProperty="Name"
+                 AppointmentSelect="@OnAppointmentSelect"
+                 Style="height: 768px;">
+    <RadzenMonthView/>
+    <RadzenWeekView/>
+    <RadzenDayView/>
+</RadzenScheduler>

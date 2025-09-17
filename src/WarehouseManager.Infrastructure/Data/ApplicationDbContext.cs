@@ -11,7 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<InventoryItem> InventoryItems { get; set; }
     public DbSet<ItemCategory> Categories { get; set; }
-    public DbSet<Event> Events { get; set; } 
+    public DbSet<Event> Events { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

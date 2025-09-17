@@ -44,14 +44,37 @@
 }
 
 /* Specific card colors */
-.card-total-items { border-left: .25rem solid #4e73df; }
-.card-total-items i { color: #4e73df; }
-.card-available-items { border-left: .25rem solid #1cc88a; }
-.card-available-items i { color: #1cc88a; }
-.card-rented-items { border-left: .25rem solid #36b9cc; }
-.card-rented-items i { color: #36b9cc; }
-.card-damaged-items { border-left: .25rem solid #f6c23e; }
-.card-damaged-items i { color: #f6c23e; }
+.card-total-items {
+    border-left: .25rem solid #4e73df;
+}
+
+.card-total-items i {
+    color: #4e73df;
+}
+
+.card-available-items {
+    border-left: .25rem solid #1cc88a;
+}
+
+.card-available-items i {
+    color: #1cc88a;
+}
+
+.card-rented-items {
+    border-left: .25rem solid #36b9cc;
+}
+
+.card-rented-items i {
+    color: #36b9cc;
+}
+
+.card-damaged-items {
+    border-left: .25rem solid #f6c23e;
+}
+
+.card-damaged-items i {
+    color: #f6c23e;
+}
 
 
 /*Dashboard Cards */

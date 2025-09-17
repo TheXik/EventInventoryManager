@@ -1,11 +1,11 @@
 @page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
-@using WarehouseManager.Core.Entities
 @using WarehouseManager.Application.Interfaces
+@using WarehouseManager.Core.Entities
 @using WarehouseManager.Core.Entities.InventoryPage
 @using WarehouseManager.Core.Enums
 @inject IInventoryItemRepository InventoryRepo
-@inject IEventRepository EventRepo 
+@inject IEventRepository EventRepo
 @attribute [Authorize]
 
 <PageTitle>Dashboard</PageTitle>
@@ -97,9 +97,11 @@
                                 <li class="list-item">
                                     <div class="item-info">
                                         <span class="item-title">@rentalEvent.ClientName</span>
-                                        <span class="item-subtitle">@rentalEvent.ItemsNeeded.Count items • Due: @rentalEvent.To.ToString("yyyy-MM-dd")</span>
+                                        <span
+                                            class="item-subtitle">@rentalEvent.ItemsNeeded.Count items • Due: @rentalEvent.EndDate.ToString("yyyy-MM-dd")</span>
                                     </div>
-                                    <span class="badge @GetRentalStatusBadge(rentalEvent.To)">@GetRentalStatusText(rentalEvent.To)</span>
+                                    <span
+                                        class="badge @GetRentalStatusBadge(rentalEvent.EndDate)">@GetRentalStatusText(rentalEvent.EndDate)</span>
                                 </li>
                             }
                         </ul>
@@ -129,7 +131,7 @@
                                         <span class="item-title">@ev.Name</span>
                                         <span class="item-subtitle">@ev.Location</span>
                                     </div>
-                                    <span class="event-date">@ev.From.ToString("MMM dd")</span>
+                                    <span class="event-date">@ev.StartDate.ToString("MMM dd")</span>
                                 </li>
                             }
                         </ul>
@@ -169,10 +171,18 @@
         _availableItemsCount = _allItems.Count(i => i.AvailabilityStatus == AvailabilityStatus.Available);
 
         var now = DateTime.Now;
-        _activeEvents = allEvents.Where(e => e.From <= now && e.To >= now).OrderBy(e => e.To).ToList();
-        _upcomingEvents = allEvents.Where(e => e.From > now).OrderBy(e => e.From).Take(5).ToList();
+        _activeEvents = allEvents.Where(e => e.StartDate <= now && e.EndDate >= now).OrderBy(e => e.EndDate).ToList();
+        _upcomingEvents = allEvents.Where(e => e.StartDate > now).OrderBy(e => e.StartDate).Take(5).ToList();
     }
 
-    private string GetRentalStatusBadge(DateTime dueDate) => dueDate < DateTime.Now.Date ? "bg-danger" : "bg-success";
-    private string GetRentalStatusText(DateTime dueDate) => dueDate < DateTime.Now.Date ? "Overdue" : "Active";
+    private string GetRentalStatusBadge(DateTime dueDate)
+    {
+        return dueDate < DateTime.Now.Date ? "bg-danger" : "bg-success";
+    }
+
+    private string GetRentalStatusText(DateTime dueDate)
+    {
+        return dueDate < DateTime.Now.Date ? "Overdue" : "Active";
+    }
+
 }

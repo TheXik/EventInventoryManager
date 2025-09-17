@@ -1,13 +1,13 @@
 @page "/inventory"
-@using WarehouseManager.Application.Interfaces
+@using EventInventoryManager.ViewModels
 @using Microsoft.AspNetCore.Authorization
-@using EventInventoryManager.ViewModels 
+@using WarehouseManager.Application.Interfaces
 @using WarehouseManager.Core.Entities.InventoryPage
-@using WarehouseManager.Core.Enums  
+@using WarehouseManager.Core.Enums
 @using WarehouseManager.Web.ViewModels
 
 @inject IInventoryItemRepository InventoryRepo
-@inject ICategoryRepository CategoryRepo 
+@inject ICategoryRepository CategoryRepo
 
 
 
@@ -43,7 +43,7 @@
             </button>
         </div>
     </div>
-    
+
     @* INVENTORY TABLE *@
     @if (_allItems is null)
     {
@@ -61,38 +61,41 @@
             <div class="table-container">
                 <table class="inventory-table align-middle">
                     <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th class="text-center">Quantity</th>
-                            <th class="text-center">Category </th>
-                            <th class="text-center" >Availability Status</th>
-                            <th class="text-center">Rental Status</th>
-                            <th class="text-center">Condition</th>
-                            <th class="text-right">Actions</th>
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Category</th>
+                        <th class="text-center">Availability Status</th>
+                        <th class="text-center">Rental Status</th>
+                        <th class="text-center">Condition</th>
+                        <th class="text-right">Actions</th>
 
-                        </tr>
+                    </tr>
                     </thead>
                     <tbody>
                     @foreach (var item in FilteredItems)
                     {
                         <tr>
-                            <td >@item.Name</td>
+                            <td>@item.Name</td>
                             <td class="text-center">@item.Quantity</td>
-                            
-                            <td class="text-center" >@item.Category.Name</td>
-                            <td class="text-center" >
-                                <span class="@GetStatusBadgeClass(item.AvailabilityStatus)" >@item.AvailabilityStatus</span>
+
+                            <td class="text-center">@item.Category.Name</td>
+                            <td class="text-center">
+                                <span
+                                    class="@GetStatusBadgeClass(item.AvailabilityStatus)">@item.AvailabilityStatus</span>
                             </td>
-                            <td class="text-center" >@item.RentalStatus</td>
+                            <td class="text-center">@item.RentalStatus</td>
                             <td class="text-center">
                                 <span class="@GetConditionBadgeClass(item.Condition)">@item.Condition</span>
                             </td>
                             <td class="text-right">
                                 <div class="action-buttons">
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenItemDetailsModal(item)">
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                            @onclick="() => OpenItemDetailsModal(item)">
                                         <i class="fas fa-info-circle"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenEditItemModal(item)">
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                            @onclick="() => OpenEditItemModal(item)">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item)">
@@ -121,21 +124,21 @@
                 </div>
                 <div class="modal-body">
                     <EditForm Model="@_viewModel" OnValidSubmit="HandleValidSubmit">
-                        <DataAnnotationsValidator />
+                        <DataAnnotationsValidator/>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Name</label>
-                                <InputText class="form-control" @bind-Value="_viewModel.Name" />
+                                <InputText class="form-control" @bind-Value="_viewModel.Name"/>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Quantity</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Quantity" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Quantity"/>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <InputTextArea class="form-control" @bind-Value="_viewModel.Description" rows="3" />
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.Description" rows="3"/>
                         </div>
 
                         <div class="mb-3">
@@ -154,11 +157,12 @@
                         {
                             <div class="mb-3 p-3 bg-light border rounded">
                                 <label class="form-label">New Category Name</label>
-                                <InputText class="form-control" @bind-Value="_viewModel.NewCategoryName" placeholder="e.g., Lighting, Audio, Cables" />
+                                <InputText class="form-control" @bind-Value="_viewModel.NewCategoryName"
+                                           placeholder="e.g., Lighting, Audio, Cables"/>
                             </div>
                         }
 
-                        <hr />
+                        <hr/>
                         <h5>Details</h5>
 
                         <div class="row">
@@ -195,10 +199,10 @@
 
                         <div class="mb-3">
                             <label class="form-label">Condition Description</label>
-                            <InputTextArea class="form-control" @bind-Value="_viewModel.ConditionDescription" rows="2" />
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.ConditionDescription" rows="2"/>
                         </div>
 
-                        <hr />
+                        <hr/>
                         <h5>Rental Information</h5>
 
                         <div class="row">
@@ -213,27 +217,27 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Rental Price (€)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice"/>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Rental Notes / Description</label>
-                            <InputTextArea class="form-control" @bind-Value="_viewModel.RentalDescription" rows="2" />
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.RentalDescription" rows="2"/>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Weight (kg)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Weight" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Weight"/>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Width (cm)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Width" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Width"/>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Height (cm)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Height" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Height"/>
                             </div>
                         </div>
 
@@ -246,7 +250,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="modal-backdrop fade show" @onclick="CloseAddModal"></div>
 }
 
@@ -270,7 +274,7 @@
                                     <input type="checkbox" class="form-check-input"
                                            id="cat-@category.Id"
                                            checked="@_filters.SelectedCategoryIds.Contains(category.Id)"
-                                           @onchange="() => ToggleSelection(_filters.SelectedCategoryIds, category.Id)" />
+                                           @onchange="() => ToggleSelection(_filters.SelectedCategoryIds, category.Id)"/>
                                     <label class="form-check-label" for="cat-@category.Id">@category.Name</label>
                                 </div>
                             }
@@ -283,10 +287,10 @@
                             @foreach (var status in Enum.GetValues<AvailabilityStatus>())
                             {
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" 
+                                    <input type="checkbox" class="form-check-input"
                                            id="status-@status"
                                            checked="@_filters.SelectedAvailabilityStatuses.Contains(status)"
-                                           @onchange="() => ToggleSelection(_filters.SelectedAvailabilityStatuses, status)" />
+                                           @onchange="() => ToggleSelection(_filters.SelectedAvailabilityStatuses, status)"/>
                                     <label class="form-check-label" for="status-@status">@status</label>
                                 </div>
                             }
@@ -296,13 +300,13 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Condition</label>
                         <div class="filter-checkbox-group">
-                             @foreach (var cond in Enum.GetValues<Condition>())
+                            @foreach (var cond in Enum.GetValues<Condition>())
                             {
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" 
+                                    <input type="checkbox" class="form-check-input"
                                            id="cond-@cond"
                                            checked="@_filters.SelectedConditions.Contains(cond)"
-                                           @onchange="() => ToggleSelection(_filters.SelectedConditions, cond)" />
+                                           @onchange="() => ToggleSelection(_filters.SelectedConditions, cond)"/>
                                     <label class="form-check-label" for="cond-@cond">@cond</label>
                                 </div>
                             }
@@ -329,7 +333,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Item Details: @_selectedItem.Name</h5>
-                    <button type="button" class="btn-close" @onclick="CloseItemDetailsModal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" @onclick="CloseItemDetailsModal"
+                            aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -342,7 +347,7 @@
                             <p>@_selectedItem.Category.Name</p>
                         </div>
                     </div>
-                    <hr />
+                    <hr/>
                     <div class="row">
                         <div class="col-md-4">
                             <strong>Quantity</strong>
@@ -362,22 +367,25 @@
                         <strong>Condition Notes</strong>
                         <p>@_selectedItem.ConditionDescription</p>
                     }
-                    <hr />
+                    <hr/>
                     <h5>Dimensions & Logistics</h5>
                     <div class="row">
                         <div class="col-md-3"><strong>Weight:</strong> @(_selectedItem.Weight) kg</div>
                         <div class="col-md-3"><strong>Width:</strong> @(_selectedItem.Width) cm</div>
                         <div class="col-md-3"><strong>Height:</strong> @(_selectedItem.Height) cm</div>
-                        <div class="col-md-3"><strong>Load Priority:</strong> @(_selectedItem.TruckLoadingPriority?.ToString() ?? "N/A")</div>
+                        <div class="col-md-3"><strong>Load
+                                Priority:</strong> @(_selectedItem.TruckLoadingPriority?.ToString() ?? "N/A")</div>
                     </div>
-                    <hr />
+                    <hr/>
                     <h5>Rental Information</h5>
                     <div class="row">
                         <div class="col-md-4"><strong>Rental Status:</strong> @_selectedItem.RentalStatus</div>
-                        <div class="col-md-4"><strong>Rental Price:</strong> @_selectedItem.RentalPrice.ToString("C")</div>
-                        <div class="col-md-4"><strong>Last Rental:</strong> @_selectedItem.RentalDate.ToShortDateString()</div>
+                        <div class="col-md-4"><strong>Rental Price:</strong> @_selectedItem.RentalPrice.ToString("C")
+                        </div>
+                        <div class="col-md-4"><strong>Last
+                                Rental:</strong> @_selectedItem.RentalDate.ToShortDateString()</div>
                     </div>
-                     @if (!string.IsNullOrWhiteSpace(_selectedItem.RentalDescription))
+                    @if (!string.IsNullOrWhiteSpace(_selectedItem.RentalDescription))
                     {
                         <strong>Rental Notes</strong>
                         <p>@_selectedItem.RentalDescription</p>
@@ -406,23 +414,23 @@
                 </div>
                 <div class="modal-body">
                     <EditForm Model="@_viewModel" OnValidSubmit="HandleUpdateSubmit">
-                        <DataAnnotationsValidator />
+                        <DataAnnotationsValidator/>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Name</label>
-                                <InputText class="form-control" @bind-Value="_viewModel.Name" />
-                                <ValidationMessage For="@(() => _viewModel.Name)" />
+                                <InputText class="form-control" @bind-Value="_viewModel.Name"/>
+                                <ValidationMessage For="@(() => _viewModel.Name)"/>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Quantity</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Quantity" />
-                                <ValidationMessage For="@(() => _viewModel.Quantity)" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Quantity"/>
+                                <ValidationMessage For="@(() => _viewModel.Quantity)"/>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <InputTextArea class="form-control" @bind-Value="_viewModel.Description" rows="3" />
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.Description" rows="3"/>
                         </div>
 
                         <div class="mb-3">
@@ -434,10 +442,10 @@
                                     <option value="@category.Id">@category.Name</option>
                                 }
                             </InputSelect>
-                            <ValidationMessage For="@(() => _viewModel.CategoryId)" />
+                            <ValidationMessage For="@(() => _viewModel.CategoryId)"/>
                         </div>
 
-                        <hr />
+                        <hr/>
                         <h5>Details</h5>
 
                         <div class="row">
@@ -474,10 +482,10 @@
 
                         <div class="mb-3">
                             <label class="form-label">Condition Description</label>
-                            <InputTextArea class="form-control" @bind-Value="_viewModel.ConditionDescription" rows="2" />
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.ConditionDescription" rows="2"/>
                         </div>
 
-                        <hr />
+                        <hr/>
                         <h5>Rental Information</h5>
 
                         <div class="row">
@@ -492,32 +500,33 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Rental Price (€)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice"/>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Rental Notes / Description</label>
-                            <InputTextArea class="form-control" @bind-Value="_viewModel.RentalDescription" rows="2" />
+                            <InputTextArea class="form-control" @bind-Value="_viewModel.RentalDescription" rows="2"/>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Weight (kg)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Weight" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Weight"/>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Width (cm)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Width" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Width"/>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Height (cm)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.Height" />
+                                <InputNumber class="form-control" @bind-Value="_viewModel.Height"/>
                             </div>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CloseEditItemModal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CloseEditItemModal">Cancel
+                            </button>
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </EditForm>
@@ -540,8 +549,9 @@
     private InventoryItem? _selectedItem; // To store the item being viewed
     private List<ItemCategory> _categories = new(); // For the dropdown
     private InventoryItemViewModel _viewModel = new();
-    
+
     private InventoryFilterViewModel _filters = new();
+
     private IEnumerable<InventoryItem> FilteredItems
     {
         get
@@ -569,12 +579,12 @@
             {
                 query = query.Where(item => _filters.SelectedAvailabilityStatuses.Contains(item.AvailabilityStatus));
             }
-            
+
             if (_filters.SelectedConditions.Any())
             {
                 query = query.Where(item => item.Condition.HasValue && _filters.SelectedConditions.Contains(item.Condition.Value));
             }
-            
+
             return query.ToList();
         }
     }
@@ -583,7 +593,7 @@
     {
         await LoadData();
     }
-  
+
     private async Task LoadData()
     {
         // Get all data from the database
@@ -592,9 +602,9 @@
         await Task.WhenAll(itemsTask, categoriesTask);
 
         _allItems = (await itemsTask).ToList();
-        _categories = (await categoriesTask).ToList(); 
+        _categories = (await categoriesTask).ToList();
     }
-    
+
     private void ToggleSelection<T>(HashSet<T> set, T value)
     {
         if (set.Contains(value))
@@ -606,7 +616,7 @@
             set.Add(value);
         }
     }
-    
+
     private async Task HandleValidSubmit()
     {
         if (_viewModel.CategoryId == -1)
@@ -681,27 +691,36 @@
         await InventoryRepo.DeleteAsync(item.Id);
         await LoadData();
     }
-    
+
     // MODAL OPENING AND CLOSING FUNCTIONS
     private void OpenAddModal()
     {
         var uncategorized = _categories.FirstOrDefault(c => c.Name == "Uncategorized");
-        int defaultCategoryId = uncategorized?.Id ?? 1;
+        var defaultCategoryId = uncategorized?.Id ?? 1;
 
         _viewModel = new InventoryItemViewModel
         {
             CategoryId = defaultCategoryId
         };
-    
+
         _isAddModalVisible = true;
     }
 
-    private void CloseAddModal() => _isAddModalVisible = false;
-    
-    private void OpenFilterModal() => _isFilterModalVisible = true;
-    
-    private void CloseFilterModal() => _isFilterModalVisible = false;
-    
+    private void CloseAddModal()
+    {
+        _isAddModalVisible = false;
+    }
+
+    private void OpenFilterModal()
+    {
+        _isFilterModalVisible = true;
+    }
+
+    private void CloseFilterModal()
+    {
+        _isFilterModalVisible = false;
+    }
+
     private void OpenItemDetailsModal(InventoryItem item)
     {
         _selectedItem = item;
@@ -713,11 +732,11 @@
         _isItemDetailsModalVisible = false;
         _selectedItem = null;
     }
-    
+
     private void OpenEditItemModal(InventoryItem item)
     {
         _selectedItem = item;
-        
+
         _viewModel = new InventoryItemViewModel
         {
             Id = item.Id,
@@ -744,7 +763,7 @@
         _isItemEditModalVisible = false;
         _selectedItem = null;
     }
-    
+
     private void ApplyFilters()
     {
         CloseFilterModal();
@@ -755,7 +774,7 @@
         _filters = new InventoryFilterViewModel();
         CloseFilterModal();
     }
-    
+
     private string GetConditionBadgeClass(Condition? condition)
     {
         // Ak je hodnota null, vrátime defaultnú sivú farbu
@@ -782,5 +801,5 @@
             _ => "badge bg-secondary"
         };
     }
-    
+
 }

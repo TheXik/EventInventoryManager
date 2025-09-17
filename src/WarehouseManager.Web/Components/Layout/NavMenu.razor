@@ -11,46 +11,52 @@
 <input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    
-    
+
+
     <nav class="flex-column">
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="dashboard">
-                        <span class="fas fa-house" aria-hidden="true" style="width: 1.25rem; margin-right: 0.75rem;"></span> Dashboard
+                        <span class="fas fa-house" aria-hidden="true"
+                              style="width: 1.25rem; margin-right: 0.75rem;"></span> Dashboard
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="inventory">
-                        <span class="fas fa-warehouse" aria-hidden="true" style="width: 1.25rem; margin-right: 0.75rem;"></span> Inventory
+                        <span class="fas fa-warehouse" aria-hidden="true"
+                              style="width: 1.25rem; margin-right: 0.75rem;"></span> Inventory
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="rentals">
-                        <span class="fas fa-key" aria-hidden="true" style="width: 1.25rem; margin-right: 0.75rem;"></span> Rentals
+                        <span class="fas fa-key" aria-hidden="true"
+                              style="width: 1.25rem; margin-right: 0.75rem;"></span> Rentals
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="events">
-                        <span class="fas fa-calendar-alt" aria-hidden="true" style="width: 1.25rem; margin-right: 0.75rem;"></span> Events
+                        <span class="fas fa-calendar-alt" aria-hidden="true"
+                              style="width: 1.25rem; margin-right: 0.75rem;"></span> Events
                     </NavLink>
                 </div>
-    
+
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Manage">
-                        <span class="fas fa-user-circle" aria-hidden="true" style="width: 1.25rem; margin-right: 0.75rem;"></span> Account
+                        <span class="fas fa-user-circle" aria-hidden="true"
+                              style="width: 1.25rem; margin-right: 0.75rem;"></span> Account
                     </NavLink>
                 </div>
-    
+
                 <div class="nav-item px-3 mt-auto">
                     <form action="Account/Logout" method="post">
-                        <AntiforgeryToken />
+                        <AntiforgeryToken/>
                         <button type="submit" class="nav-link">
-                            <span class="fas fa-sign-out-alt" aria-hidden="true" style="width: 1.25rem; margin-right: 0.75rem;"></span> Logout
+                            <span class="fas fa-sign-out-alt" aria-hidden="true"
+                                  style="width: 1.25rem; margin-right: 0.75rem;"></span> Logout
                         </button>
                     </form>
                 </div>

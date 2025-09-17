@@ -1,0 +1,137 @@
+.top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+}
+
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.event-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ccc;
+}
+
+.card-body {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.card-footer {
+    padding: 10px 15px;
+    background-color: #f7f7f7;
+    border-top: 1px solid #ccc;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+}
+
+.status-not-started {
+    background-color: #6c757d;
+}
+
+.status-started {
+    background-color: #0d6efd;
+}
+
+.status-in-progress {
+    background-color: #ffc107;
+}
+
+.status-completed {
+    background-color: #198754;
+}
+
+.status-cancelled {
+    background-color: #dc3545;
+}
+
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
