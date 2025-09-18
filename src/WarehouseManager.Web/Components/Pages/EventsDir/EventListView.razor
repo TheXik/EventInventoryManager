@@ -15,7 +15,7 @@ else
                     <button class="btn-icon btn-delete" @onclick="() => OnDeleteClick.InvokeAsync(ev)"><i class="fas fa-trash-alt"></i></button>
                 </div>
                 <h5 class="card-title">@ev.Name</h5>
-                <p class="card-detail"><i class="far fa-calendar-alt"></i> @ev.StartDate.ToString("MMM dd, yyyy")</p>
+                <p class="card-detail"><i class="far fa-calendar-alt"></i> @ev.StartDate.ToString("MMM dd, yyyy")  -    @ev.EndDate.ToString("MMM dd, yyyy")</p>
                 <p class="card-detail"><i class="far fa-clock"></i> @ev.StartDate.ToString("t") - @ev.EndDate.ToString("t")</p>
                 <p class="card-detail"><i class="fas fa-map-marker-alt"></i> @ev.Location</p>
             </div>
