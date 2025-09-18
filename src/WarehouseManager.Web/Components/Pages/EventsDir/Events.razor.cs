@@ -51,12 +51,13 @@ namespace WarehouseManager.Web.Components.Pages.EventsDir
                 EndDate = startDate.AddHours(1),
                 Color = "#3788d8" 
             };
-            _eventForm.Open(newEvent, isNew: true);
+            _eventForm.Create();
         }
 
         private void EditEvent(Event eventToEdit)
         {
-            _eventForm.Open(eventToEdit, isNew: false);
+            _eventForm.Edit(eventToEdit);
+
         }
 
         private async Task DeleteEvent(Event eventToDelete)

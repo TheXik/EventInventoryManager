@@ -97,8 +97,9 @@
                                 <li class="list-item">
                                     <div class="item-info">
                                         <span class="item-title">@rentalEvent.ClientName</span>
-                                        <span
-                                            class="item-subtitle">@rentalEvent.ItemsNeeded.Count items • Due: @rentalEvent.EndDate.ToString("yyyy-MM-dd")</span>
+                                    <span
+                                            class="item-subtitle">@rentalEvent.EventInventoryItems.Count items • Due: @rentalEvent.EndDate.ToString("yyyy-MM-dd")</span>                                     @* TODO UPDATE THHJIS WHEN I HAVE CREATED RENTAL *@
+
                                     </div>
                                     <span
                                         class="badge @GetRentalStatusBadge(rentalEvent.EndDate)">@GetRentalStatusText(rentalEvent.EndDate)</span>

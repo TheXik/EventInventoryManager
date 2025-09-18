@@ -17,14 +17,14 @@ public class EventRepository : IEventRepository
     public async Task<IEnumerable<Event>> GetAllAsync()
     {
         return await _context.Events
-            .Include(e => e.ItemsNeeded) // Načíta aj priradené položky
+            .Include(e => e.EventInventoryItems) // Načíta aj priradené položky
             .ToListAsync();
     }
 
     public async Task<Event?> GetByIdAsync(int id)
     {
         return await _context.Events
-            .Include(e => e.ItemsNeeded)
+            .Include(e => e.EventInventoryItems)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 

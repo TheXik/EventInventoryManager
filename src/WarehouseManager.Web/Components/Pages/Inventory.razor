@@ -77,7 +77,7 @@
                     {
                         <tr>
                             <td>@item.Name</td>
-                            <td class="text-center">@item.Quantity</td>
+                            <td class="text-center">@item.AvailableQuantity / @item.TotalQuantity</td>
 
                             <td class="text-center">@item.Category.Name</td>
                             <td class="text-center">
@@ -351,7 +351,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <strong>Quantity</strong>
-                            <p>@_selectedItem.Quantity</p>
+                            <p>@_selectedItem.AvailableQuantity / @_selectedItem.TotalQuantity</p>
                         </div>
                         <div class="col-md-4">
                             <strong>Availability</strong>
@@ -636,7 +636,8 @@
         {
             Name = _viewModel.Name,
             Description = _viewModel.Description,
-            Quantity = _viewModel.Quantity,
+            AvailableQuantity = _viewModel.Quantity,
+            TotalQuantity = _viewModel.Quantity,
             CategoryId = _viewModel.CategoryId,
             AvailabilityStatus = _viewModel.AvailabilityStatus,
             Weight = _viewModel.Weight,
@@ -668,7 +669,7 @@
 
         itemToUpdate.Name = _viewModel.Name;
         itemToUpdate.Description = _viewModel.Description;
-        itemToUpdate.Quantity = _viewModel.Quantity;
+        itemToUpdate.TotalQuantity = _viewModel.Quantity;
         itemToUpdate.CategoryId = _viewModel.CategoryId;
         itemToUpdate.AvailabilityStatus = _viewModel.AvailabilityStatus;
         itemToUpdate.Weight = _viewModel.Weight;
@@ -742,7 +743,7 @@
             Id = item.Id,
             Name = item.Name,
             Description = item.Description,
-            Quantity = item.Quantity,
+            Quantity = item.TotalQuantity,
             CategoryId = item.CategoryId,
             AvailabilityStatus = item.AvailabilityStatus,
             Weight = item.Weight,

@@ -52,6 +52,10 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 // Event service
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 
+//Event inventory manager
+builder.Services.AddScoped<IEventInventoryItemRepository, EventInventoryItemRepository>();
+
+
 builder.Services.AddRadzenComponents();
 
 

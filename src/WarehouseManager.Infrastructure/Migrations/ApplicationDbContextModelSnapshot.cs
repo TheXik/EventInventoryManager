@@ -251,6 +251,27 @@ namespace WarehouseManager.Infrastructure.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("WarehouseManager.Core.Entities.EventInventoryItem", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("InventoryItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("EventId", "InventoryItemId");
+
+                    b.HasIndex("InventoryItemId");
+
+                    b.ToTable("EventInventoryItems");
+                });
+
             modelBuilder.Entity("WarehouseManager.Core.Entities.InventoryPage.InventoryItem", b =>
                 {
                     b.Property<int>("Id")
@@ -258,6 +279,9 @@ namespace WarehouseManager.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AvailabilityStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AvailableQuantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("CategoryId")
@@ -272,18 +296,12 @@ namespace WarehouseManager.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("EventId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Height")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("RentalDate")
                         .HasColumnType("TEXT");
@@ -295,6 +313,9 @@ namespace WarehouseManager.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RentalStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TotalQuantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("TruckLoadingPriority")
@@ -309,8 +330,6 @@ namespace WarehouseManager.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("EventId");
 
                     b.ToTable("InventoryItems");
                 });
@@ -391,6 +410,25 @@ namespace WarehouseManager.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WarehouseManager.Core.Entities.EventInventoryItem", b =>
+                {
+                    b.HasOne("WarehouseManager.Core.Entities.Event", "Event")
+                        .WithMany("EventInventoryItems")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WarehouseManager.Core.Entities.InventoryPage.InventoryItem", "InventoryItem")
+                        .WithMany("EventInventoryItems")
+                        .HasForeignKey("InventoryItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("InventoryItem");
+                });
+
             modelBuilder.Entity("WarehouseManager.Core.Entities.InventoryPage.InventoryItem", b =>
                 {
                     b.HasOne("WarehouseManager.Core.Entities.InventoryPage.ItemCategory", "Category")
@@ -399,16 +437,17 @@ namespace WarehouseManager.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WarehouseManager.Core.Entities.Event", null)
-                        .WithMany("ItemsNeeded")
-                        .HasForeignKey("EventId");
-
                     b.Navigation("Category");
                 });
 
             modelBuilder.Entity("WarehouseManager.Core.Entities.Event", b =>
                 {
-                    b.Navigation("ItemsNeeded");
+                    b.Navigation("EventInventoryItems");
+                });
+
+            modelBuilder.Entity("WarehouseManager.Core.Entities.InventoryPage.InventoryItem", b =>
+                {
+                    b.Navigation("EventInventoryItems");
                 });
 #pragma warning restore 612, 618
         }

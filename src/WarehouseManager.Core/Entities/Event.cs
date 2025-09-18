@@ -19,5 +19,4 @@ public class Event
     public string? RecurrenceRule { get; set; } 
     
     public EventStatus eventStatus { get; set; }
-    public List<InventoryItem> ItemsNeeded { get; set; } = new();
-}
+    public ICollection<EventInventoryItem> EventInventoryItems { get; set; }}

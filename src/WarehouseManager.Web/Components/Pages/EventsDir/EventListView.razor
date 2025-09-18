@@ -11,13 +11,29 @@ else
         {
             <div class="event-card" style="border-left-color: @ev.Color">
                 <div class="card-actions">
-                    <button class="btn-icon" @onclick="() => OnEditClick.InvokeAsync(ev)"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="btn-icon btn-delete" @onclick="() => OnDeleteClick.InvokeAsync(ev)"><i class="fas fa-trash-alt"></i></button>
+                    <button class="btn-icon" @onclick="() => OnEditClick.InvokeAsync(ev)">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="btn-icon btn-delete" @onclick="() => OnDeleteClick.InvokeAsync(ev)">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+
                 </div>
                 <h5 class="card-title">@ev.Name</h5>
-                <p class="card-detail"><i class="far fa-calendar-alt"></i> @ev.StartDate.ToString("MMM dd, yyyy")  -    @ev.EndDate.ToString("MMM dd, yyyy")</p>
-                <p class="card-detail"><i class="far fa-clock"></i> @ev.StartDate.ToString("t") - @ev.EndDate.ToString("t")</p>
-                <p class="card-detail"><i class="fas fa-map-marker-alt"></i> @ev.Location</p>
+                <p class="card-detail">
+                    <i class="far fa-calendar-alt"></i> @ev.StartDate.ToString("MMM dd, yyyy") - @ev.EndDate.ToString("MMM dd, yyyy")
+                </p>
+                <p class="card-detail">
+                    <i class="far fa-clock"></i> @ev.StartDate.ToString("t") - @ev.EndDate.ToString("t")
+                </p>
+                <p class="card-detail">
+                    <i class="fas fa-map-marker-alt"></i> @ev.Location
+                </p>
+                <div class="card-footer-actions">
+                    <a href="/event-inventory/@ev.Id" class="btn btn-primary btn-sm">
+                        <i class="fas fa-tasks"></i> Add Items
+                    </a>
+                </div>
             </div>
         }
     </div>
