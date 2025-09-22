@@ -5,25 +5,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using WarehouseManager.Application.Interfaces;
 using WarehouseManager.Core.Entities.InventoryPage;
+using WarehouseManager.Infrastructure.Repositories;
 
 namespace WarehouseManager.Web.Components.Pages.EventsDir
 {
     public partial class EventInventory
     {
-        [Parameter]
-        public int EventId { get; set; }
+        [Parameter] public int EventId { get; set; }
 
-        [Inject]
-        private IEventRepository _EventRepository { get; set; }
-        
-        [Inject]
-        private IInventoryItemRepository _InventoryItemRepository { get; set; }
+        [Inject] private IEventRepository _EventRepository { get; set; }
 
-        [Inject]
-        private IEventInventoryItemRepository _EventInventoryItemRepository { get; set; } // <-- Add this
+        [Inject] private IInventoryItemRepository _InventoryItemRepository { get; set; }
 
-        [Inject]
-        private NavigationManager _NavigationManager { get; set; }
+        [Inject] private IEventInventoryItemRepository _EventInventoryItemRepository { get; set; } // <-- Add this
+
+        [Inject] private NavigationManager _NavigationManager { get; set; }
 
 
         private Event _event;
@@ -31,6 +27,8 @@ namespace WarehouseManager.Web.Components.Pages.EventsDir
         private List<InventoryItem> availableItems;
         private List<EventInventoryItem> selectedItems;
         private string searchTerm = "";
+        private string? _errorMessage;
+
 
         protected override async Task OnInitializedAsync()
         {
@@ -44,7 +42,8 @@ namespace WarehouseManager.Web.Components.Pages.EventsDir
         {
             var selectedIds = selectedItems.Select(i => i.InventoryItemId);
             availableItems = allItems
-                .Where(i => !selectedIds.Contains(i.Id) && i.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .Where(i => !selectedIds.Contains(i.Id) &&
+                            i.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
 
@@ -69,58 +68,89 @@ namespace WarehouseManager.Web.Components.Pages.EventsDir
             selectedItems.Remove(eventItem);
             FilterItems();
         }
+
         private int GetMaxQuantityForItem(InventoryItem item)
         {
             var selected = selectedItems.FirstOrDefault(si => si.InventoryItemId == item.Id);
             if (selected != null)
             {
-                // The max quantity is the amount currently available in the warehouse
-                // PLUS the amount already assigned to this event.
                 return item.AvailableQuantity + selected.Quantity;
             }
+
             return item.AvailableQuantity;
+        }
+
+        private void CorrectQuantity(EventInventoryItem item, ChangeEventArgs e, int max)
+        {
+            if (int.TryParse(e.Value?.ToString(), out int value))
+            {
+                if (value < 1)
+                {
+                    item.Quantity = 1; // Immediately reset to 1 if the user enters 0 or less
+                }
+                else if (value > max)
+                {
+                    item.Quantity = max; // Immediately reset to the max if the user enters a higher number
+                }
+            }
         }
 
         private async Task SaveChanges()
         {
-            // Get the original items for this event before any changes
+            _errorMessage = null; // Clear any previous errors
+
+            // Get the original list of items assigned to this event
             var originalItems = (await _EventInventoryItemRepository.GetByEventIdAsync(EventId)).ToList();
 
-            // Return items that were removed
-            foreach (var originalItem in originalItems)
+            // --- VALIDATION STEP ---
+            // First, check if the requested changes are possible before making any database calls.
+            foreach (var selectedItem in selectedItems)
             {
-                if (!selectedItems.Any(si => si.InventoryItemId == originalItem.InventoryItemId))
+                var itemInWarehouse = await InventoryItemRepository.GetByIdAsync(selectedItem.InventoryItemId);
+                var originalItem =
+                    originalItems.FirstOrDefault(oi => oi.InventoryItemId == selectedItem.InventoryItemId);
+
+                // Calculate how many *more* items are being requested than before.
+                int quantityChange = selectedItem.Quantity - (originalItem?.Quantity ?? 0);
+
+                if (quantityChange > itemInWarehouse.AvailableQuantity)
                 {
-                    var item = await InventoryItemRepository.GetByIdAsync(originalItem.InventoryItemId);
-                    item.AvailableQuantity += originalItem.Quantity;
+                    _errorMessage = $"Cannot save changes. Not enough '{itemInWarehouse.Name}' in stock. " +
+                                    $"You are trying to assign {quantityChange} more, but only {itemInWarehouse.AvailableQuantity} are available.";
+                    StateHasChanged();
+                    return; // Stop the entire save process
+                }
+            }
+
+            // --- If validation passes, proceed with saving ---
+
+            // Return items that were fully removed from the event
+            foreach (var originalItem in originalItems.Where(oi =>
+                         !selectedItems.Any(si => si.InventoryItemId == oi.InventoryItemId)))
+            {
+                var item = await InventoryItemRepository.GetByIdAsync(originalItem.InventoryItemId);
+                item.AvailableQuantity += originalItem.Quantity;
+                item.UpdateAvailabilityStatus();
+                await InventoryItemRepository.UpdateAsync(item);
+            }
+
+            // Update quantities for items that were added or changed
+            foreach (var selectedItem in selectedItems)
+            {
+                var item = await InventoryItemRepository.GetByIdAsync(selectedItem.InventoryItemId);
+                var originalItem =
+                    originalItems.FirstOrDefault(oi => oi.InventoryItemId == selectedItem.InventoryItemId);
+                int quantityDifference = selectedItem.Quantity - (originalItem?.Quantity ?? 0);
+
+                if (quantityDifference != 0)
+                {
+                    item.AvailableQuantity -= quantityDifference;
                     item.UpdateAvailabilityStatus();
                     await InventoryItemRepository.UpdateAsync(item);
                 }
             }
 
-            // Add or update items
-            foreach (var selectedItem in selectedItems)
-            {
-                var originalItem = originalItems.FirstOrDefault(oi => oi.InventoryItemId == selectedItem.InventoryItemId);
-                var item = await InventoryItemRepository.GetByIdAsync(selectedItem.InventoryItemId);
-
-                if (originalItem != null)
-                {
-                    // The item was already in the event, so we just adjust the quantity
-                    int quantityDifference = selectedItem.Quantity - originalItem.Quantity;
-                    item.AvailableQuantity -= quantityDifference;
-                }
-                else
-                {
-                    // This is a new item for the event
-                    item.AvailableQuantity -= selectedItem.Quantity;
-                }
-
-                item.UpdateAvailabilityStatus();
-                await InventoryItemRepository.UpdateAsync(item);
-            }
-
-            // Now, save the changes to the event's inventory list
+            // Finally, save the updated list of items for the event
             _event.EventInventoryItems = selectedItems;
             await EventRepository.UpdateAsync(_event);
 

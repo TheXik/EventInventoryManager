@@ -16,10 +16,13 @@ namespace WarehouseManager.Infrastructure.Repositories
 
         public async Task<IEnumerable<EventInventoryItem>> GetByEventIdAsync(int eventId)
         {
+            // the database ignoring any in-memory change when asNoTracking is used
             return await _context.EventInventoryItems
+                .AsNoTracking()
                 .Where(ei => ei.EventId == eventId)
                 .ToListAsync();
         }
+
 
         public async Task AddAsync(EventInventoryItem entity)
         {
