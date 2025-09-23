@@ -11,27 +11,39 @@ else
         {
             <div class="event-card" style="border-left-color: @ev.Color">
                 <div class="card-actions">
-                    <button class="btn-icon" @onclick="() => OnEditClick.InvokeAsync(ev)">
+                    <button class="btn-icon" title="Edit Event" @onclick="() => OnEditClick.InvokeAsync(ev)">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <button class="btn-icon btn-delete" @onclick="() => OnDeleteClick.InvokeAsync(ev)">
+                    <button class="btn-icon btn-delete" title="Delete Event" @onclick="() => OnDeleteClick.InvokeAsync(ev)">
                         <i class="fas fa-trash-alt"></i>
                     </button>
-
                 </div>
+
                 <h5 class="card-title">@ev.Name</h5>
+
                 <p class="card-detail">
-                    <i class="far fa-calendar-alt"></i> @ev.StartDate.ToString("MMM dd, yyyy") - @ev.EndDate.ToString("MMM dd, yyyy")
+                    <i class="fas fa-map-marker-alt fa-fw" style="margin-right: 0.5rem;"></i> 
+                    <strong>Location:</strong> @ev.Location
                 </p>
                 <p class="card-detail">
-                    <i class="far fa-clock"></i> @ev.StartDate.ToString("t") - @ev.EndDate.ToString("t")
+                    <i class="far fa-calendar-alt fa-fw" style="margin-right: 0.5rem;"></i> 
+                    <strong>Date:</strong> @ev.StartDate.ToString("MMM dd, yyyy") - @ev.EndDate.ToString("MMM dd, yyyy")
                 </p>
                 <p class="card-detail">
-                    <i class="fas fa-map-marker-alt"></i> @ev.Location
+                    <i class="far fa-clock fa-fw" style="margin-right: 0.5rem;"></i> 
+                    <strong>Time:</strong> @ev.StartDate.ToString("t") - @ev.EndDate.ToString("t")
+                </p>
+
+                <hr style="margin: 0.75rem 0;" />
+                <p class="card-detail">
+                    <i class="fas fa-building fa-fw" style="margin-right: 0.5rem;"></i> 
+                    <strong>Client:</strong> @ev.ClientName
                 </p>
                 <p class="card-detail">
-                    <i class="fas fa-contact-card"></i> @ev.ClientContact
+                    <i class="fas fa-user-circle fa-fw" style="margin-right: 0.5rem;"></i> 
+                    <strong>Contact:</strong> @ev.ClientContact
                 </p>
+
                 <div class="card-footer-actions">
                     <a href="/event-inventory/@ev.Id" class="btn btn-primary btn-sm">
                         <i class="fas fa-tasks"></i> Add Items
@@ -41,3 +53,4 @@ else
         }
     </div>
 }
+
