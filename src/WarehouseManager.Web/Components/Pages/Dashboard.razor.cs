@@ -6,13 +6,12 @@ namespace WarehouseManager.Web.Components.Pages;
 
 public partial class Dashboard
 {
-    private List<InventoryItem> _allItems = new();
-    private int _totalItems;
-    private int _rentedItemsCount;
-    private int _damagedItemsCount;
-    private int _availableItemsCount;
-
     private List<Event> _activeEvents = new();
+    private List<InventoryItem> _allItems = new();
+    private int _availableItemsCount;
+    private int _damagedItemsCount;
+    private int _rentedItemsCount;
+    private int _totalItems;
     private List<Event> _upcomingEvents = new();
 
     protected override async Task OnInitializedAsync()
@@ -43,5 +42,4 @@ public partial class Dashboard
     {
         return dueDate < DateTime.Now.Date ? "Overdue" : "Active";
     }
-
 }

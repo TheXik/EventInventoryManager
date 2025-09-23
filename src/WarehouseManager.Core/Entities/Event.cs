@@ -1,4 +1,3 @@
-using WarehouseManager.Core.Entities.InventoryPage;
 using WarehouseManager.Core.Enums;
 
 namespace WarehouseManager.Core.Entities;
@@ -16,8 +15,9 @@ public class Event
 
     public string? Description { get; set; }
     public string? Category { get; set; }
-    public string? Color { get; set; } 
-    public string? RecurrenceRule { get; set; } 
-    
+    public string? Color { get; set; }
+    public string? RecurrenceRule { get; set; }
+
     public EventStatus eventStatus { get; set; }
-    public ICollection<EventInventoryItem> EventInventoryItems { get; set; }}
+    public ICollection<EventInventoryItem> EventInventoryItems { get; set; }
+}

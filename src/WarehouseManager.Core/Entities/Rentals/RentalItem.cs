@@ -6,15 +6,14 @@ namespace WarehouseManager.Core.Entities.Rentals;
 
 public class RentalItem
 {
-    [Key]
-    public int RentalItemId { get; set; }
+    [Key] public int RentalItemId { get; set; }
 
-    [ForeignKey(nameof(Rental))]
-    public int RentalId { get; set; }
+    [ForeignKey(nameof(Rental))] public int RentalId { get; set; }
+
     public Rental Rental { get; set; }
 
-    [ForeignKey(nameof(InventoryItem))]
-    public int InventoryItemId { get; set; }
+    [ForeignKey(nameof(InventoryItem))] public int InventoryItemId { get; set; }
+
     public InventoryItem InventoryItem { get; set; }
 
     public int QuantityRented { get; set; }

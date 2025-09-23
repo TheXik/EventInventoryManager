@@ -1,30 +1,35 @@
 using Microsoft.AspNetCore.Components;
 using WarehouseManager.Application.Interfaces;
 using WarehouseManager.Core.Entities;
-using WarehouseManager.Core.Entities.Rentals;
 using WarehouseManager.Core.Entities.InventoryPage;
+using WarehouseManager.Core.Entities.Rentals;
 using WarehouseManager.Core.Enums;
 
 namespace WarehouseManager.Web.Components.Pages.RentalsDir;
 
 public partial class RentalCreationWorkflow
 {
+    private readonly List<RentalRow> _lines = new();
+
+    private readonly Rental _model = new()
+        { RentalDate = DateTime.Today, ExpectedReturnDate = DateTime.Today.AddDays(1) };
+
+    private List<InventoryItem> _all = new();
+    private List<InventoryItem> _available = new();
+    private Rental? _draft;
+    private string _search = string.Empty;
+
+    private int _step = 1;
     [Inject] private IRentalRepository RentalRepository { get; set; } = default!;
     [Inject] private IRentalItemRepository RentalItemRepository { get; set; } = default!;
     [Inject] private IInventoryItemRepository InventoryRepository { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
 
-    private int _step = 1;
-    private Rental _model = new() { RentalDate = DateTime.Today, ExpectedReturnDate = DateTime.Today.AddDays(1) };
-    private Rental? _draft;
-
-    private List<InventoryItem> _all = new();
-    private List<InventoryItem> _available = new();
-    private string _search = string.Empty;
-
-    private List<RentalRow> _lines = new();
-
     private int _days => Math.Max(1, (int)Math.Ceiling((_model.ExpectedReturnDate - _model.RentalDate).TotalDays));
+
+    private decimal Subtotal => _lines.Sum(l => l.PricePerDay * l.Quantity * _days);
+    private decimal Discount => Math.Round(Subtotal * (_model.DiscountPercentage / 100m), 2);
+    private decimal Total => Subtotal - Discount;
 
     protected override async Task OnInitializedAsync()
     {
@@ -161,15 +166,18 @@ public partial class RentalCreationWorkflow
             // Need more units; ensure available
             if (line.Item.AvailableQuantity < delta)
             {
-                StateHasChanged(); return;
+                StateHasChanged();
+                return;
             }
+
             line.Item.AvailableQuantity -= delta;
         }
         else
         {
             // releasing some units
-            line.Item.AvailableQuantity += (-delta);
+            line.Item.AvailableQuantity += -delta;
         }
+
         line.Item.UpdateAvailabilityStatus();
         await InventoryRepository.UpdateAsync(line.Item);
 
@@ -189,15 +197,20 @@ public partial class RentalCreationWorkflow
         StateHasChanged();
     }
 
-    private decimal Subtotal => _lines.Sum(l => l.PricePerDay * l.Quantity * _days);
-    private decimal Discount => Math.Round(Subtotal * (_model.DiscountPercentage / 100m), 2);
-    private decimal Total => Subtotal - Discount;
+    private decimal EffectivePrice(InventoryItem item)
+    {
+        return item.RentalPricePerDay > 0 ? item.RentalPricePerDay : item.RentalPricePerDay;
+    }
 
-    private decimal EffectivePrice(InventoryItem item) => item.RentalPricePerDay > 0 ? item.RentalPricePerDay : (decimal)item.RentalPricePerDay;
+    private string Eur(decimal value)
+    {
+        return $"€{value:N2}";
+    }
 
-    private string Eur(decimal value) => $"€{value:N2}";
-
-    private void GoToStep3() => _step = 3;
+    private void GoToStep3()
+    {
+        _step = 3;
+    }
 
     private async Task ConfirmDispatch()
     {
@@ -221,7 +234,4 @@ public partial class RentalCreationWorkflow
 
         Nav.NavigateTo($"/rentals/{_draft.RentalId}");
     }
-
-  
 }
-

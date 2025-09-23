@@ -1,5 +1,5 @@
 main {
-    background-color: #acdeff !important; ;
+    background-color: #acdeff !important;;
 }
 
 html, body {
@@ -56,7 +56,7 @@ h1:focus {
 
 @media print {
     body, .page {
-      
+
         background: #fff !important;
         display: block !important;
     }
@@ -70,7 +70,7 @@ h1:focus {
         margin: 0 !important;
         padding: 0 !important;
     }
-    
+
     .page-header a,
     .page-footer,
     .btn,

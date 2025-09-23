@@ -3,54 +3,46 @@ using Radzen;
 using Radzen.Blazor;
 using WarehouseManager.Core.Entities;
 
-namespace WarehouseManager.Web.Components.Pages.EventsDir
+namespace WarehouseManager.Web.Components.Pages.EventsDir;
+
+public partial class EventCalendarView
 {
-    public partial class EventCalendarView
+    private RadzenScheduler<Event> _scheduler = default!;
+
+    [Parameter] public IEnumerable<Event>? Events { get; set; }
+
+    [Parameter] public EventCallback<Event> OnEventClick { get; set; }
+
+    [Parameter] public EventCallback<DateTime> OnDateSelect { get; set; }
+
+    [Parameter] public EventCallback<Event> OnEventUpdate { get; set; }
+
+    private async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        [Parameter]
-        public IEnumerable<Event>? Events { get; set; }
+        await OnDateSelect.InvokeAsync(args.Start);
+    }
 
-        [Parameter]
-        public EventCallback<Event> OnEventClick { get; set; }
+    private async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Event> args)
+    {
+        await OnEventClick.InvokeAsync(args.Data);
+    }
 
-        [Parameter]
-        public EventCallback<DateTime> OnDateSelect { get; set; }
-
-        [Parameter]
-        public EventCallback<Event> OnEventUpdate { get; set; }
-
-        private RadzenScheduler<Event> _scheduler = default!;
-
-        private async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    private async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    {
+        var eventToUpdate = args.Appointment.Data as Event;
+        if (eventToUpdate != null)
         {
-            await OnDateSelect.InvokeAsync(args.Start);
-        }
+            var duration = eventToUpdate.EndDate - eventToUpdate.StartDate;
 
-        private async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Event> args)
-        {
-            await OnEventClick.InvokeAsync(args.Data);
-        }
-        
-        private async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
-        {
-            var eventToUpdate = args.Appointment.Data as Event;
-            if (eventToUpdate != null)
-            {
-                TimeSpan duration = eventToUpdate.EndDate - eventToUpdate.StartDate;
-                
-                eventToUpdate.StartDate = args.SlotDate; 
-                eventToUpdate.EndDate = args.SlotDate + duration;
+            eventToUpdate.StartDate = args.SlotDate;
+            eventToUpdate.EndDate = args.SlotDate + duration;
 
-                await OnEventUpdate.InvokeAsync(eventToUpdate);
-            }
+            await OnEventUpdate.InvokeAsync(eventToUpdate);
         }
+    }
 
-        private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Event> args)
-        {
-            if (!string.IsNullOrEmpty(args.Data.Color))
-            {
-                args.Attributes["style"] = $"background-color: {args.Data.Color};";
-            }
-        }
+    private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Event> args)
+    {
+        if (!string.IsNullOrEmpty(args.Data.Color)) args.Attributes["style"] = $"background-color: {args.Data.Color};";
     }
 }

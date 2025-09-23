@@ -13,11 +13,11 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; 
+    justify-content: space-between;
 }
 
 .card-content {
-    flex-grow: 1; 
+    flex-grow: 1;
 }
 
 .card-actions {

@@ -7,15 +7,14 @@ namespace WarehouseManager.Web.Components.Pages.RentalsDir;
 
 public partial class RentalReturn
 {
+    private List<ReturnLine> _lines = new();
+
+    private Rental? _rental;
     [Parameter] public int RentalId { get; set; }
 
     [Inject] private IRentalRepository RentalRepository { get; set; } = default!;
     [Inject] private IInventoryItemRepository InventoryRepository { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
-
-    private Rental? _rental;
-
-    private List<ReturnLine> _lines = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -50,17 +49,11 @@ public partial class RentalReturn
                 {
                     item.Condition = Condition.Damaged;
                     item.RentalStatus = RentalStatus.NotInRentalUse; // damaged items are temporarily not rentable
-                    if (!string.IsNullOrWhiteSpace(line.Notes))
-                    {
-                        item.ConditionDescription = line.Notes;
-                    }
+                    if (!string.IsNullOrWhiteSpace(line.Notes)) item.ConditionDescription = line.Notes;
                 }
 
                 // Update item after changes to availability or condition
-                if (deltaReturned > 0 || line.Damaged)
-                {
-                    await InventoryRepository.UpdateAsync(item);
-                }
+                if (deltaReturned > 0 || line.Damaged) await InventoryRepository.UpdateAsync(item);
             }
         }
 
@@ -68,7 +61,7 @@ public partial class RentalReturn
         var allReturned = _rental.RentalItems.All(x => x.QuantityReturned >= x.QuantityRented);
         if (allReturned)
         {
-            _rental.Status = WarehouseManager.Core.Enums.RentalOrderStatus.Returned;
+            _rental.Status = RentalOrderStatus.Returned;
             _rental.ActualReturnDate = DateTime.Now;
         }
 

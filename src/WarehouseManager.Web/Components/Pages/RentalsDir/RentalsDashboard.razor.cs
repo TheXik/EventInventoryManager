@@ -8,17 +8,16 @@ namespace WarehouseManager.Web.Components.Pages.RentalsDir;
 
 public partial class RentalsDashboard
 {
+    private IEnumerable<Rental>? _rentals;
+    private string _search = string.Empty;
     [Inject] private IRentalRepository RentalRepository { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
-    private IEnumerable<Rental>? _rentals;
-    private string _search = string.Empty;
-
     private IEnumerable<Rental> _filtered => string.IsNullOrWhiteSpace(_search)
         ? _rentals ?? Enumerable.Empty<Rental>()
         : (_rentals ?? Enumerable.Empty<Rental>())
-            .Where(r => (r.ClientName ?? string.Empty).Contains(_search, StringComparison.OrdinalIgnoreCase));
+        .Where(r => (r.ClientName ?? string.Empty).Contains(_search, StringComparison.OrdinalIgnoreCase));
 
     protected override async Task OnInitializedAsync()
     {

@@ -1,8 +1,7 @@
-namespace WarehouseManager.Infrastructure.Services
+namespace WarehouseManager.Infrastructure.Services;
+
+public class GeminiOptions
 {
-    public class GeminiOptions
-    {
-        public string? ApiKey { get; set; }
-        public string? Model { get; set; }
-    }
+    public string? ApiKey { get; set; }
+    public string? Model { get; set; }
 }

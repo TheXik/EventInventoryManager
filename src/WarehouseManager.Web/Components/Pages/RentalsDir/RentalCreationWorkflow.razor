@@ -1,8 +1,5 @@
 @page "/rentals/new"
-@using WarehouseManager.Core.Entities.Rentals
-@using WarehouseManager.Core.Entities.InventoryPage
 @using WarehouseManager.Core.Enums
-@using WarehouseManager.Application.Interfaces
 
 <div class="page-container">
     <div class="page-header">
@@ -13,31 +10,31 @@
     @if (_step == 1)
     {
         <EditForm Model="_model" OnValidSubmit="GoToStep2">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
             <div class="text-muted small mb-2">Fields marked * are required.</div>
             <div class="card">
                 <div class="card-header"><h4>Step 1: Client & Dates</h4></div>
                 <div class="card-body row g-3">
                     <div class="col-md-6">
                         <label>Client Name *</label>
-                        <InputText class="form-control" @bind-Value="_model.ClientName" />
+                        <InputText class="form-control" @bind-Value="_model.ClientName"/>
                     </div>
                     <div class="col-md-6">
                         <label>Contact Info</label>
-                        <InputText class="form-control" @bind-Value="_model.ContactInfo" />
+                        <InputText class="form-control" @bind-Value="_model.ContactInfo"/>
                     </div>
                     <div class="col-md-4">
                         <label>Rental Date *</label>
-                        <InputDate class="form-control" @bind-Value="_model.RentalDate" />
+                        <InputDate class="form-control" @bind-Value="_model.RentalDate"/>
                     </div>
                     <div class="col-md-4">
                         <label>Expected Return *</label>
-                        <InputDate class="form-control" @bind-Value="_model.ExpectedReturnDate" />
+                        <InputDate class="form-control" @bind-Value="_model.ExpectedReturnDate"/>
                     </div>
                     <div class="col-md-4">
                         <label>Discount %</label>
-                        <InputNumber class="form-control" @bind-Value="_model.DiscountPercentage" />
+                        <InputNumber class="form-control" @bind-Value="_model.DiscountPercentage"/>
                     </div>
                 </div>
                 <div class="card-footer text-end">
@@ -56,17 +53,20 @@
                         <div class="text-muted">@_days days</div>
                     </div>
                     <div class="card-body">
-                        <input class="form-control mb-3" placeholder="Search items..." @bind="_search" />
+                        <input class="form-control mb-3" placeholder="Search items..." @bind="_search"/>
                         <div class="items-scroller">
                             @foreach (var item in _available)
                             {
                                 <div class="inventory-item d-flex justify-content-between align-items-center">
                                     <div>
                                         <strong>@item.Name</strong>
-                                        <small class="text-muted"> @item.AvailableQuantity avail · @Eur(EffectivePrice(item))/day</small>
+                                        <small class="text-muted"> @item.AvailableQuantity avail
+                                            · @Eur(EffectivePrice(item))/day</small>
                                     </div>
                                     <div>
-                                        <button class="btn btn-sm btn-outline-primary" disabled="@(item.AvailableQuantity <= 0)" @onclick="@(() => AddItem(item))"><i class="fas fa-plus"></i></button>
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                disabled="@(item.AvailableQuantity <= 0)"
+                                                @onclick="@(() => AddItem(item))"><i class="fas fa-plus"></i></button>
                                     </div>
                                 </div>
                             }
@@ -80,7 +80,8 @@
                     <div class="card-body">
                         @if (!_lines.Any())
                         {
-                            <div class="empty-state"><i class="fas fa-box-open"></i><p>No items selected.</p></div>
+                            <div class="empty-state"><i class="fas fa-box-open"></i>
+                                <p>No items selected.</p></div>
                         }
                         else
                         {
@@ -93,11 +94,17 @@
                                             <small class="text-muted">@Eur(line.PricePerDay)/day</small>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <InputNumber class="form-control quantity-input me-2" @bind-Value="line.Quantity" min="1" max="@(line.Item.AvailableQuantity + line.Quantity)" @oninput="@((ChangeEventArgs e) => OnQtyChange(line, e))" />
-                                            <button class="btn btn-sm btn-outline-danger" @onclick="@(() => RemoveLine(line))"><i class="fas fa-trash"></i></button>
+                                            <InputNumber class="form-control quantity-input me-2"
+                                                         @bind-Value="line.Quantity" min="1"
+                                                         max="@(line.Item.AvailableQuantity + line.Quantity)"
+                                                         @oninput="@(e => OnQtyChange(line, e))"/>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    @onclick="@(() => RemoveLine(line))"><i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="text-end small">Line Total: <strong>@Eur(line.Quantity * line.PricePerDay * _days)</strong></div>
+                                    <div class="text-end small">Line Total:
+                                        <strong>@Eur(line.Quantity * line.PricePerDay * _days)</strong></div>
                                 </div>
                             }
                         }
@@ -107,14 +114,17 @@
                 <div class="card">
                     <div class="card-header"><h5>Financial Summary</h5></div>
                     <div class="card-body">
-                        <div class="d-flex justify-content-between"><span>Subtotal</span><strong>@Eur(Subtotal)</strong></div>
-                        <div class="d-flex justify-content-between"><span>Discount</span><strong>-@Eur(Discount)</strong></div>
+                        <div class="d-flex justify-content-between"><span>Subtotal</span><strong>@Eur(Subtotal)</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Discount</span><strong>-@Eur(Discount)</strong></div>
                         <div class="d-flex justify-content-between"><span>Total</span><strong>@Eur(Total)</strong></div>
-                        <hr />
+                        <hr/>
                     </div>
                     <div class="card-footer text-end">
                         <button class="btn btn-secondary me-2" @onclick="@(() => _step = 1)">Back</button>
-                        <button class="btn btn-primary" @onclick="GoToStep3" disabled="@(!_lines.Any())">Continue</button>
+                        <button class="btn btn-primary" @onclick="GoToStep3" disabled="@(!_lines.Any())">Continue
+                        </button>
                     </div>
                 </div>
             </div>
@@ -142,7 +152,9 @@
             </div>
             <div class="card-footer d-flex justify-content-between">
                 <button class="btn btn-secondary" @onclick="@(() => _step = 2)">Back</button>
-                <button class="btn btn-success" @onclick="ConfirmDispatch"><i class="fas fa-truck"></i> Confirm & Dispatch Rental</button>
+                <button class="btn btn-success" @onclick="ConfirmDispatch"><i class="fas fa-truck"></i> Confirm &
+                    Dispatch Rental
+                </button>
             </div>
         </div>
     }

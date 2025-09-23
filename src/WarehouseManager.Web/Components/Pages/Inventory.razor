@@ -1,7 +1,6 @@
 @page "/inventory"
 @using Microsoft.AspNetCore.Authorization
 @using WarehouseManager.Application.Interfaces
-@using WarehouseManager.Core.Entities.InventoryPage
 @using WarehouseManager.Core.Enums
 
 @inject IInventoryItemRepository InventoryRepo
@@ -21,103 +20,103 @@
     </div>
 }
 
-    @* TITLE AND ADD BUTTON *@
-    <div class="page-header">
-        <div class="page-header-title">
-            <h1 class="primary-text">Manage Inventory</h1>
-            <p>Manage your warehouse equipment and stock</p>
-        </div>
+@* TITLE AND ADD BUTTON *@
+<div class="page-header">
+    <div class="page-header-title">
+        <h1 class="primary-text">Manage Inventory</h1>
+        <p>Manage your warehouse equipment and stock</p>
     </div>
+</div>
 
-    @* SEARCH AND FILTER BOXES *@
-    <div class="page-toolbar">
-        <div class="toolbar-actions">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="form-control search-input" placeholder="Search..."
-                       @bind="_searchQuery" @bind:event="oninput"/>
+@* SEARCH AND FILTER BOXES *@
+<div class="page-toolbar">
+    <div class="toolbar-actions">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control search-input" placeholder="Search..."
+                   @bind="_searchQuery" @bind:event="oninput"/>
+        </div>
+        <button class="btn btn-secondary btn-filter" @onclick="OpenFilterModal">
+            <i class="fas fa-filter"></i>
+            <span>Filter</span>
+        </button>
+    </div>
+</div>
+
+@* INVENTORY TABLE *@
+@if (_allItems is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="page-inventory-table">
+        <div class="page-inventory-title-button">
+            <div>
+                <h3>
+                    <i class="fas fa-box-archive"></i> <span>Inventory Items</span>
+                </h3>
+                <p>Complete list of warehouse equipment and their current status</p>
             </div>
-            <button class="btn btn-secondary btn-filter" @onclick="OpenFilterModal">
-                <i class="fas fa-filter"></i>
-                <span>Filter</span>
+
+            <button class="btn btn-primary btn-add-item" @onclick="OpenAddModal">
+                <i class="fas fa-plus"></i>
+                <span>Add New Item</span>
             </button>
         </div>
-    </div>
+        <div class="table-container">
+            <table class="inventory-table align-middle">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-center">Category</th>
+                    <th class="text-center">Availability Status</th>
+                    <th class="text-center">Rental Status</th>
+                    <th class="text-center">Condition</th>
+                    <th class="text-right">Actions</th>
 
-    @* INVENTORY TABLE *@
-    @if (_allItems is null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <div class="page-inventory-table">
-            <div class="page-inventory-title-button">
-                <div>
-                    <h3>
-                        <i class="fas fa-box-archive"></i> <span>Inventory Items</span>
-                    </h3>
-                    <p>Complete list of warehouse equipment and their current status</p>
-                </div>
-                
-                <button class="btn btn-primary btn-add-item" @onclick="OpenAddModal">
-                    <i class="fas fa-plus"></i>
-                    <span>Add New Item</span>
-                </button>
-            </div>
-            <div class="table-container">
-                <table class="inventory-table align-middle">
-                    <thead>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in FilteredItems)
+                {
                     <tr>
-                        <th>Name</th>
-                        <th class="text-center">Quantity</th>
-                        <th class="text-center">Category</th>
-                        <th class="text-center">Availability Status</th>
-                        <th class="text-center">Rental Status</th>
-                        <th class="text-center">Condition</th>
-                        <th class="text-right">Actions</th>
+                        <td>@item.Name</td>
+                        <td class="text-center">@item.AvailableQuantity / @item.TotalQuantity</td>
 
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var item in FilteredItems)
-                    {
-                        <tr>
-                            <td>@item.Name</td>
-                            <td class="text-center">@item.AvailableQuantity / @item.TotalQuantity</td>
-
-                            <td class="text-center">@item.Category.Name</td>
-                            <td class="text-center">
+                        <td class="text-center">@item.Category.Name</td>
+                        <td class="text-center">
                                 <span
                                     class="@GetStatusBadgeClass(item.AvailabilityStatus)">@item.AvailabilityStatus</span>
-                            </td>
-                            <td class="text-center">@item.RentalStatus</td>
-                            <td class="text-center">
-                                <span class="@GetConditionBadgeClass(item.Condition)">@item.Condition</span>
-                            </td>
-                            <td class="text-right">
-                                <div class="action-buttons">
-                                    <button class="btn btn-sm btn-outline-secondary"
-                                            @onclick="() => OpenItemDetailsModal(item)">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary"
-                                            @onclick="() => OpenEditItemModal(item)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item)">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+                        </td>
+                        <td class="text-center">@item.RentalStatus</td>
+                        <td class="text-center">
+                            <span class="@GetConditionBadgeClass(item.Condition)">@item.Condition</span>
+                        </td>
+                        <td class="text-right">
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        @onclick="() => OpenItemDetailsModal(item)">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        @onclick="() => OpenEditItemModal(item)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
         </div>
-    }
-    
+    </div>
+}
+
 @* MODAL Add *@
 @if (_isAddModalVisible)
 {
@@ -131,7 +130,7 @@
                 <div class="modal-body">
                     <EditForm Model="@_viewModel" OnValidSubmit="HandleValidSubmit">
                         <DataAnnotationsValidator/>
-                        <ValidationSummary />
+                        <ValidationSummary/>
                         <div class="text-muted small mb-2">Fields marked * are required.</div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -388,7 +387,8 @@
                     <h5>Rental Information</h5>
                     <div class="row">
                         <div class="col-md-4"><strong>Rental Status:</strong> @_selectedItem.RentalStatus</div>
-                        <div class="col-md-4"><strong>Rental Price:</strong> @_selectedItem.RentalPricePerDay.ToString("C")
+                        <div class="col-md-4"><strong>Rental
+                                Price:</strong> @_selectedItem.RentalPricePerDay.ToString("C")
                         </div>
                         <div class="col-md-4"><strong>Last
                                 Rental:</strong> @_selectedItem.RentalDate.ToShortDateString()</div>
@@ -423,7 +423,7 @@
                 <div class="modal-body">
                     <EditForm Model="@_viewModel" OnValidSubmit="HandleUpdateSubmit">
                         <DataAnnotationsValidator/>
-                        <ValidationSummary />
+                        <ValidationSummary/>
                         <div class="text-muted small mb-2">Fields marked * are required.</div>
                         <div class="row">
                             <div class="col-md-6 mb-3">

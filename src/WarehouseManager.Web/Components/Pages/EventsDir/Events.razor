@@ -7,10 +7,12 @@
     <div class="view-toggle">
         <h1>My Events</h1>
         <div>
-            <button class="btn @(isCalendarView ? "btn-secondary" : "btn-primary")" @onclick="() => isCalendarView = false">
+            <button class="btn @(isCalendarView ? "btn-secondary" : "btn-primary")"
+                    @onclick="() => isCalendarView = false">
                 <i class="fas fa-list"></i> List View
             </button>
-            <button class="btn @(isCalendarView ? "btn-primary" : "btn-secondary")" @onclick="() => isCalendarView = true">
+            <button class="btn @(isCalendarView ? "btn-primary" : "btn-secondary")"
+                    @onclick="() => isCalendarView = true">
                 <i class="fas fa-calendar-alt"></i> Calendar View
             </button>
         </div>
@@ -18,7 +20,8 @@
 
     @if (isCalendarView)
     {
-        <EventCalendarView Events="_events" OnEventClick="EditEvent" OnDateSelect="AddNewEvent" OnEventUpdate="HandleEventUpdate"/>
+        <EventCalendarView Events="_events" OnEventClick="EditEvent" OnDateSelect="AddNewEvent"
+                           OnEventUpdate="HandleEventUpdate"/>
     }
     else
     {
@@ -29,4 +32,4 @@
     }
 </div>
 
-<EventForm @ref="_eventForm" OnSave="HandleSaveEvent" />
+<EventForm @ref="_eventForm" OnSave="HandleSaveEvent"/>

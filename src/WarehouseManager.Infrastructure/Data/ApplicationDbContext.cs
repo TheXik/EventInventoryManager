@@ -24,7 +24,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         base.OnModelCreating(builder);
         builder.Entity<ItemCategory>().HasData(
             new ItemCategory { Id = 1, Name = "Uncategorized" });
-        
+
         builder.Entity<EventInventoryItem>()
             .HasKey(ei => new { ei.EventId, ei.InventoryItemId });
 

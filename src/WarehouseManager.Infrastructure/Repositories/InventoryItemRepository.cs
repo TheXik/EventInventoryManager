@@ -41,7 +41,6 @@ public class InventoryItemRepository : IInventoryItemRepository
     {
         var item = await GetByIdAsync(id);
         if (item != null)
-        {
             try
             {
                 _context.InventoryItems.Remove(item);
@@ -49,9 +48,10 @@ public class InventoryItemRepository : IInventoryItemRepository
             }
             catch (DbUpdateException ex)
             {
-                throw new InvalidOperationException("Cannot delete this item because it is referenced in one or more rentals. Remove the item from those rentals or mark rentals as returned before deleting.", ex);
+                throw new InvalidOperationException(
+                    "Cannot delete this item because it is referenced in one or more rentals. Remove the item from those rentals or mark rentals as returned before deleting.",
+                    ex);
             }
-        }
     }
 
     public async Task<int> CountActiveRentalReferencesAsync(int inventoryItemId)

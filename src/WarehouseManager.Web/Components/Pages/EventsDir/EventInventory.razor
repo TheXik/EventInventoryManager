@@ -1,100 +1,104 @@
 @page "/event-inventory/{EventId:int}"
-@using System.ComponentModel.DataAnnotations
 @using WarehouseManager.Application.Interfaces
-@using WarehouseManager.Core.Entities
 @inject IEventRepository EventRepository
 @inject IInventoryItemRepository InventoryItemRepository
 @inject NavigationManager NavigationManager
 
-    @if (_event == null)
-    {
-        <div class="loading-spinner"></div>
-    }
-    else
-    {
-        <div class="page-header">
-            <a href="/events" class="back-link"><i class="fas fa-arrow-left"></i> Back to Events</a>
-            <h1>Manage Inventory</h1>
-            <p class="text-muted">For Event: <strong>@_event.Name</strong></p>
-        </div>
+@if (_event == null)
+{
+    <div class="loading-spinner"></div>
+}
+else
+{
+    <div class="page-header">
+        <a href="/events" class="back-link"><i class="fas fa-arrow-left"></i> Back to Events</a>
+        <h1>Manage Inventory</h1>
+        <p class="text-muted">For Event: <strong>@_event.Name</strong></p>
+    </div>
 
-        <EditForm Model="@_event" OnValidSubmit="SaveChanges">
-            <DataAnnotationsValidator />
+    <EditForm Model="@_event" OnValidSubmit="SaveChanges">
+        <DataAnnotationsValidator/>
 
-            <div class="inventory-container">
-                <div class="inventory-list card">
-                    <div class="card-header">
-                        <h4>Available Items</h4>
-                    </div>
-                    <div class="card-body">
-                        <input @bind="searchTerm" @oninput="FilterItems" class="form-control mb-3" placeholder="Search available items..." />
-                        <div class="items-scroller">
-                            @foreach (var item in availableItems)
-                            {
-                                <div class="inventory-item">
+        <div class="inventory-container">
+            <div class="inventory-list card">
+                <div class="card-header">
+                    <h4>Available Items</h4>
+                </div>
+                <div class="card-body">
+                    <input @bind="searchTerm" @oninput="FilterItems" class="form-control mb-3"
+                           placeholder="Search available items..."/>
+                    <div class="items-scroller">
+                        @foreach (var item in availableItems)
+                        {
+                            <div class="inventory-item">
                                     <span>
                                         @item.Name
                                         <small class="text-muted">(@item.AvailableQuantity in stock)</small>
                                     </span>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => AddItemToEvent(item)" disabled="@(item.AvailableQuantity <= 0)">
-                                        <i class="fas fa-plus"></i> Add
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        @onclick="() => AddItemToEvent(item)" disabled="@(item.AvailableQuantity <= 0)">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="inventory-list card">
+                <div class="card-header">
+                    <h4>Selected Items for Event</h4>
+                </div>
+                <div class="card-body">
+                    <div class="items-scroller">
+                        @if (!selectedItems.Any())
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-box-open"></i>
+                                <p>No items selected.</p>
+                                <small>Add items from the list on the left.</small>
+                            </div>
+                        }
+                        @foreach (var eventItem in selectedItems)
+                        {
+                            <div class="inventory-item selected-item">
+                                <span>@eventItem.InventoryItem.Name</span>
+                                <div class="quantity-controls">
+                                    <InputNumber @bind-Value="eventItem.Quantity"
+                                                 min="1"
+                                                 max="@GetMaxQuantityForItem(eventItem.InventoryItem)"
+                                                 @oninput="e => CorrectQuantity(eventItem, e, GetMaxQuantityForItem(eventItem.InventoryItem))"
+                                                 class="form-control quantity-input"/>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            @onclick="() => RemoveItemFromEvent(eventItem)">
+                                        <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <div class="inventory-list card">
-                    <div class="card-header">
-                        <h4>Selected Items for Event</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="items-scroller">
-                            @if (!selectedItems.Any())
-                            {
-                                <div class="empty-state">
-                                    <i class="fas fa-box-open"></i>
-                                    <p>No items selected.</p>
-                                    <small>Add items from the list on the left.</small>
-                                </div>
-                            }
-                            @foreach (var eventItem in selectedItems)
-                            {
-                                <div class="inventory-item selected-item">
-                                    <span>@eventItem.InventoryItem.Name</span>
-                                    <div class="quantity-controls">
-                                        <InputNumber @bind-Value="eventItem.Quantity"
-                                                     min="1"
-                                                     max="@GetMaxQuantityForItem(eventItem.InventoryItem)"
-                                                     @oninput="(e) => CorrectQuantity(eventItem, e, GetMaxQuantityForItem(eventItem.InventoryItem))"
-                                                     class="form-control quantity-input" />
-                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveItemFromEvent(eventItem)">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <ValidationMessage For="@(() => eventItem.Quantity)" />
-                            }
-                        </div>
+                            </div>
+                            <ValidationMessage For="@(() => eventItem.Quantity)"/>
+                        }
                     </div>
                 </div>
             </div>
+        </div>
 
-            @if (!string.IsNullOrEmpty(_errorMessage))
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @_errorMessage
-                    <button type="button" class="btn-close" @onclick="() => _errorMessage = null"></button>
-                </div>
-            }
-
-            <div class="page-footer">
-                <button type="button" class="btn btn-secondary" @onclick='() => _NavigationManager.NavigateTo("/events")'>Cancel</button>
-                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
-                <button type="button" class="btn btn-primary" title="Prepare Loading Plan" @onclick='() => _NavigationManager.NavigateTo($"/event-loading/{EventId}")'>
-                    <i class="fas fa-truck"></i> Prepare for Loading
-                </button>
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @_errorMessage
+                <button type="button" class="btn-close" @onclick="() => _errorMessage = null"></button>
             </div>
-        </EditForm>
-    }
+        }
+
+        <div class="page-footer">
+            <button type="button" class="btn btn-secondary" @onclick='() => _NavigationManager.NavigateTo("/events")'>
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+            <button type="button" class="btn btn-primary" title="Prepare Loading Plan"
+                    @onclick='() => _NavigationManager.NavigateTo($"/event-loading/{EventId}")'>
+                <i class="fas fa-truck"></i> Prepare for Loading
+            </button>
+        </div>
+    </EditForm>
+}

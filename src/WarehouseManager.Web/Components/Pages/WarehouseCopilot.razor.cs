@@ -1,22 +1,27 @@
+using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using WarehouseManager.Application.Interfaces;
+using WarehouseManager.Core.Entities;
+using WarehouseManager.Core.Entities.Rentals;
+using WarehouseManager.Core.Enums;
 
 namespace WarehouseManager.Web.Components.Pages;
 
 public partial class WarehouseCopilot
 {
     // System prompt kept internal for future LLM integration
-    private const string SystemPrompt = "You are the \"AI Assistant,\" a smart and efficient helper designed for an event company's warehouse. Your main goal is to provide fast, accurate information about inventory, assist in planning events, and simplify logistics. Your communication style should be brief, clear, and friendly. Always aim to provide the most relevant information based on the available data about items, their status, location, and current rentals.";
+    private const string SystemPrompt =
+        "You are the \"AI Assistant,\" a smart and efficient helper designed for an event company's warehouse. Your main goal is to provide fast, accurate information about inventory, assist in planning events, and simplify logistics. Your communication style should be brief, clear, and friendly. Always aim to provide the most relevant information based on the available data about items, their status, location, and current rentals.";
+
+    private readonly List<Message> _messages = new();
+    private string _draft = string.Empty;
 
     [Inject] private IChatAiService ChatAi { get; set; } = default!;
     [Inject] private IInventoryItemRepository InventoryRepo { get; set; } = default!;
     [Inject] private IEventRepository EventRepo { get; set; } = default!;
     [Inject] private IRentalRepository RentalRepo { get; set; } = default!;
 
-    private readonly List<Message> _messages = new();
-    private string _draft = string.Empty;
-    
 
     private async Task Send()
     {
@@ -37,10 +42,7 @@ public partial class WarehouseCopilot
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter")
-        {
-            await Send();
-        }
+        if (e.Key == "Enter") await Send();
     }
 
     private async Task<string> BuildContextualSystemPromptAsync()
@@ -52,22 +54,25 @@ public partial class WarehouseCopilot
             var rentals = (await RentalRepo.GetAllAsync()).ToList();
 
             var now = DateTime.Now;
-            var overdue = rentals.Where(r => r.Status != WarehouseManager.Core.Enums.RentalOrderStatus.Returned && r.ExpectedReturnDate.Date < now.Date)
-                                 .OrderBy(r => r.ExpectedReturnDate)
-                                 .ToList();
+            var overdue = rentals
+                .Where(r => r.Status != RentalOrderStatus.Returned && r.ExpectedReturnDate.Date < now.Date)
+                .OrderBy(r => r.ExpectedReturnDate)
+                .ToList();
 
             // Inventory: include all items with full status
             var itemLines = items
                 .OrderBy(i => i.Name)
-                .Select(i => $"- {i.Id} | {i.Name} | Avail: {i.AvailableQuantity}/{i.TotalQuantity} | Availability: {i.AvailabilityStatus} | RentalStatus: {i.RentalStatus} | Condition: {i.Condition} |  {(string.IsNullOrWhiteSpace(i.ConditionDescription) ? string.Empty : $"({i.ConditionDescription})")}");
+                .Select(i =>
+                    $"- {i.Id} | {i.Name} | Avail: {i.AvailableQuantity}/{i.TotalQuantity} | Availability: {i.AvailabilityStatus} | RentalStatus: {i.RentalStatus} | Condition: {i.Condition} |  {(string.IsNullOrWhiteSpace(i.ConditionDescription) ? string.Empty : $"({i.ConditionDescription})")}");
 
             // Events: include items per event
             var eventBlocks = eventsList
                 .OrderBy(e => e.StartDate)
                 .Select(e => new
                 {
-                    Header = $"- EVENT #{e.Id}: {e.Name} | {e.StartDate:yyyy-MM-dd} → {e.EndDate:yyyy-MM-dd} | Items: {e.EventInventoryItems?.Count ?? 0}",
-                    Lines = (e.EventInventoryItems ?? new List<WarehouseManager.Core.Entities.EventInventoryItem>())
+                    Header =
+                        $"- EVENT #{e.Id}: {e.Name} | {e.StartDate:yyyy-MM-dd} → {e.EndDate:yyyy-MM-dd} | Items: {e.EventInventoryItems?.Count ?? 0}",
+                    Lines = (e.EventInventoryItems ?? new List<EventInventoryItem>())
                         .Select(ei => $"    • ItemId:{ei.InventoryItemId} Qty:{ei.Quantity}")
                 });
 
@@ -76,16 +81,19 @@ public partial class WarehouseCopilot
                 .OrderBy(r => r.ExpectedReturnDate)
                 .Select(r => new
                 {
-                    Header = $"- RENTAL #{r.RentalId}: {r.ClientName} | Status:{r.Status} | Payment:{r.PaymentStatus} | Dates: {r.RentalDate:yyyy-MM-dd} → {r.ExpectedReturnDate:yyyy-MM-dd}{(r.ActualReturnDate.HasValue ? $" (Returned:{r.ActualReturnDate.Value:yyyy-MM-dd})" : string.Empty)}",
-                    Lines = (r.RentalItems ?? new List<WarehouseManager.Core.Entities.Rentals.RentalItem>())
-                        .Select(ri => $"    • ItemId:{ri.InventoryItemId} QtyRented:{ri.QuantityRented} QtyReturned:{ri.QuantityReturned} Price/Day:{ri.PricePerDayAtTimeOfRental}")
+                    Header =
+                        $"- RENTAL #{r.RentalId}: {r.ClientName} | Status:{r.Status} | Payment:{r.PaymentStatus} | Dates: {r.RentalDate:yyyy-MM-dd} → {r.ExpectedReturnDate:yyyy-MM-dd}{(r.ActualReturnDate.HasValue ? $" (Returned:{r.ActualReturnDate.Value:yyyy-MM-dd})" : string.Empty)}",
+                    Lines = (r.RentalItems ?? new List<RentalItem>())
+                        .Select(ri =>
+                            $"    • ItemId:{ri.InventoryItemId} QtyRented:{ri.QuantityRented} QtyReturned:{ri.QuantityReturned} Price/Day:{ri.PricePerDayAtTimeOfRental}")
                 });
 
-            var sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
             sb.AppendLine(SystemPrompt);
             sb.AppendLine();
             sb.AppendLine("CRITICAL RULES:");
-            sb.AppendLine("- Answer ONLY using the data in the CONTEXT below. If something is not present, say you don't have that information and offer to check or ask a human.");
+            sb.AppendLine(
+                "- Answer ONLY using the data in the CONTEXT below. If something is not present, say you don't have that information and offer to check or ask a human.");
             sb.AppendLine("- Do NOT invent item names, events, quantities, clients, dates, or locations.");
             sb.AppendLine("- Keep answers brief and actionable. If a list is long, summarize counts.");
             sb.AppendLine();
@@ -101,6 +109,7 @@ public partial class WarehouseCopilot
                 sb.AppendLine(block.Header);
                 foreach (var ln in block.Lines) sb.AppendLine(ln);
             }
+
             sb.AppendLine();
             sb.AppendLine("Rentals (ALL, WITH ITEMS):");
             foreach (var block in rentalBlocks)
@@ -108,18 +117,18 @@ public partial class WarehouseCopilot
                 sb.AppendLine(block.Header);
                 foreach (var ln in block.Lines) sb.AppendLine(ln);
             }
+
             sb.AppendLine();
             sb.AppendLine("Overdue Rentals:");
             if (overdue.Any())
-            {
                 foreach (var r in overdue)
                     sb.AppendLine($"- RENTAL #{r.RentalId} | {r.ClientName} | Due: {r.ExpectedReturnDate:yyyy-MM-dd}");
-            }
             else sb.AppendLine("- None");
             sb.AppendLine("CONTEXT END");
 
             sb.AppendLine();
-            sb.AppendLine("If the user asks to 'prep gear' for an event, verify each requested item exists and has sufficient AvailableQuantity; if not, report the shortfall. Do not assign times/locations that are not in the context.");
+            sb.AppendLine(
+                "If the user asks to 'prep gear' for an event, verify each requested item exists and has sufficient AvailableQuantity; if not, report the shortfall. Do not assign times/locations that are not in the context.");
 
             return sb.ToString();
         }

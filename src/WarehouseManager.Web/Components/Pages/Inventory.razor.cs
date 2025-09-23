@@ -57,52 +57,42 @@ internal class InventoryFilterViewModel
 
 public partial class Inventory
 {
-    
     private List<InventoryItem>? _allItems;
-    private string _searchQuery = "";
+    private List<ItemCategory> _categories = new(); // For the dropdown
+    private string? _errorMessage;
+
+    private InventoryFilterViewModel _filters = new();
     private bool _isAddModalVisible;
     private bool _isFilterModalVisible;
     private bool _isItemDetailsModalVisible;
     private bool _isItemEditModalVisible;
+    private string _searchQuery = "";
     private InventoryItem? _selectedItem; // To store the item being viewed
-    private List<ItemCategory> _categories = new(); // For the dropdown
     private InventoryItemViewModel _viewModel = new();
-    private string? _errorMessage;
-
-    private InventoryFilterViewModel _filters = new();
 
     private IEnumerable<InventoryItem> FilteredItems
     {
         get
         {
-            if (_allItems is null)
-            {
-                return Enumerable.Empty<InventoryItem>();
-            }
+            if (_allItems is null) return Enumerable.Empty<InventoryItem>();
 
             var query = _allItems.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(_searchQuery))
-            {
                 query = query.Where(item =>
                     item.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    (item.Description != null && item.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)));
-            }
+                    (item.Description != null &&
+                     item.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)));
 
             if (_filters.SelectedCategoryIds.Any())
-            {
                 query = query.Where(item => _filters.SelectedCategoryIds.Contains(item.CategoryId));
-            }
 
             if (_filters.SelectedAvailabilityStatuses.Any())
-            {
                 query = query.Where(item => _filters.SelectedAvailabilityStatuses.Contains(item.AvailabilityStatus));
-            }
 
             if (_filters.SelectedConditions.Any())
-            {
-                query = query.Where(item => item.Condition.HasValue && _filters.SelectedConditions.Contains(item.Condition.Value));
-            }
+                query = query.Where(item =>
+                    item.Condition.HasValue && _filters.SelectedConditions.Contains(item.Condition.Value));
 
             return query.ToList();
         }
@@ -127,13 +117,9 @@ public partial class Inventory
     private void ToggleSelection<T>(HashSet<T> set, T value)
     {
         if (set.Contains(value))
-        {
             set.Remove(value);
-        }
         else
-        {
             set.Add(value);
-        }
     }
 
     private async Task HandleValidSubmit()
@@ -170,7 +156,7 @@ public partial class Inventory
                 RentalPricePerDay = _viewModel.RentalPricePerDay,
                 Condition = _viewModel.Condition,
                 ConditionDescription = _viewModel.ConditionDescription,
-                Category = null
+                Category = null!
             };
 
             await InventoryRepo.AddAsync(newItem);
@@ -229,7 +215,8 @@ public partial class Inventory
             var activeRefs = await InventoryRepo.CountActiveRentalReferencesAsync(item.Id);
             if (activeRefs > 0)
             {
-                var confirm = await JS.InvokeAsync<bool>("confirm", $"This item is included in {activeRefs} active rental(s). If you delete it, those rental records may be affected. Are you sure you want to proceed?");
+                var confirm = await JS.InvokeAsync<bool>("confirm",
+                    $"This item is included in {activeRefs} active rental(s). If you delete it, those rental records may be affected. Are you sure you want to proceed?");
                 if (!confirm) return;
             }
 
@@ -332,10 +319,7 @@ public partial class Inventory
 
     private string GetConditionBadgeClass(Condition? condition)
     {
-        if (!condition.HasValue)
-        {
-            return "badge bg-secondary";
-        }
+        if (!condition.HasValue) return "badge bg-secondary";
 
         return condition.Value switch
         {
@@ -355,5 +339,4 @@ public partial class Inventory
             _ => "badge bg-secondary"
         };
     }
-
 }

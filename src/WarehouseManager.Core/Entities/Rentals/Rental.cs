@@ -5,11 +5,9 @@ namespace WarehouseManager.Core.Entities.Rentals;
 
 public class Rental
 {
-    [Key]
-    public int RentalId { get; set; }
+    [Key] public int RentalId { get; set; }
 
-    [Required]
-    public string ClientName { get; set; }
+    [Required] public string ClientName { get; set; }
 
     public string ContactInfo { get; set; } = string.Empty;
 

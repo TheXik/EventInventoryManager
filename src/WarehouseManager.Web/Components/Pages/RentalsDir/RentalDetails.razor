@@ -1,72 +1,72 @@
 @page "/rentals/{RentalId:int}"
 @using WarehouseManager.Core.Enums
 
-    @if (_rental == null)
-    {
-        <div class="loading-spinner"></div>
-    }
-    else
-    {
-        <div class="page-header d-flex justify-content-between align-items-center">
-            <div>
-                <a class="back-link" href="/rentals">
-                    <i class="fas fa-arrow-left"></i> Back to Rentals
-                </a>
-                <h1>Rental Details</h1>
-                <p class="text-muted">Client: <strong>@_rental.ClientName</strong></p>
-            </div>
-            @if (_rental.Status == RentalOrderStatus.Rented)
+@if (_rental == null)
+{
+    <div class="loading-spinner"></div>
+}
+else
+{
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <a class="back-link" href="/rentals">
+                <i class="fas fa-arrow-left"></i> Back to Rentals
+            </a>
+            <h1>Rental Details</h1>
+            <p class="text-muted">Client: <strong>@_rental.ClientName</strong></p>
+        </div>
+        @if (_rental.Status == RentalOrderStatus.Rented)
+        {
+            <button class="btn btn-success" @onclick="@(() => Nav.NavigateTo($"/rentals/{_rental.RentalId}/return"))">
+                <i class="fas fa-undo"></i> Process Return
+            </button>
+        }
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body row g-3">
+            <div class="col-md-3"><strong>Status:</strong>
+                <span class="badge bg-secondary">@_rental.Status</span></div>
+            <div class="col-md-3"><strong>Payment:</strong>
+                <span class="badge bg-secondary">@_rental.PaymentStatus</span></div>
+            <div class="col-md-3"><strong>Return:</strong> @_rental.ExpectedReturnDate.ToShortDateString()</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h4>Items</h4></div>
+        <div class="card-body">
+            @if (_rental.RentalItems == null || !_rental.RentalItems.Any())
             {
-                <button class="btn btn-success" @onclick="@(() => Nav.NavigateTo($"/rentals/{_rental.RentalId}/return"))">
-                    <i class="fas fa-undo"></i> Process Return
-                </button>
+                <div class="empty-state"><i class="fas fa-box-open"></i>
+                    <p>No items.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty Rented</th>
+                            <th>Qty Returned</th>
+                            <th>Price/Day</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var i in _rental.RentalItems)
+                        {
+                            <tr>
+                                <td>@i.InventoryItem?.Name</td>
+                                <td>@i.QuantityRented</td>
+                                <td>@i.QuantityReturned</td>
+                                <td>@Eur(i.PricePerDayAtTimeOfRental)</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
             }
         </div>
-
-        <div class="card mb-3">
-            <div class="card-body row g-3">
-                <div class="col-md-3"><strong>Status:</strong> 
-                    <span class="badge bg-secondary">@_rental.Status</span></div>
-                <div class="col-md-3"><strong>Payment:</strong> 
-                    <span class="badge bg-secondary">@_rental.PaymentStatus</span></div>
-                <div class="col-md-3"><strong>Return:</strong> @_rental.ExpectedReturnDate.ToShortDateString()</div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header"><h4>Items</h4></div>
-            <div class="card-body">
-                @if (_rental.RentalItems == null || !_rental.RentalItems.Any())
-                {
-                    <div class="empty-state"><i class="fas fa-box-open"></i>
-                        <p>No items.</p></div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Qty Rented</th>
-                                <th>Qty Returned</th>
-                                <th>Price/Day</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var i in _rental.RentalItems)
-                            {
-                                <tr>
-                                    <td>@i.InventoryItem?.Name</td>
-                                    <td>@i.QuantityRented</td>
-                                    <td>@i.QuantityReturned</td>
-                                    <td>@Eur(i.PricePerDayAtTimeOfRental)</td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
-        </div>
-    }
+    </div>
+}

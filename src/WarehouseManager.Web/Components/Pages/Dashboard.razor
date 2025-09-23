@@ -1,161 +1,158 @@
 @page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
 @using WarehouseManager.Application.Interfaces
-@using WarehouseManager.Core.Entities
-@using WarehouseManager.Core.Entities.InventoryPage
-@using WarehouseManager.Core.Enums
 @inject IInventoryItemRepository InventoryRepo
 @inject IEventRepository EventRepo
 @attribute [Authorize]
 
 <PageTitle>Dashboard</PageTitle>
 
-    <div class="page-header">
-        <div class="page-header-title">
-            <h1 class="primary-text">Dashboard</h1>
-            <p>Overview of your inventory, rentals, and upcoming events.</p>
-        </div>
+<div class="page-header">
+    <div class="page-header-title">
+        <h1 class="primary-text">Dashboard</h1>
+        <p>Overview of your inventory, rentals, and upcoming events.</p>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card-total-items h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Items</div>
-                            <div class="h5 mb-0 font-weight-bold">@_totalItems</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-boxes-stacked fa-2x"></i>
-                        </div>
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card card-total-items h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Total Items</div>
+                        <div class="h5 mb-0 font-weight-bold">@_totalItems</div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card-available-items h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Available</div>
-                            <div class="h5 mb-0 font-weight-bold">@_availableItemsCount</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card-rented-items h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Rented Out</div>
-                            <div class="h5 mb-0 font-weight-bold">@_rentedItemsCount</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-truck-loading fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card-damaged-items h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Damaged</div>
-                            <div class="h5 mb-0 font-weight-bold">@_damagedItemsCount</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                        </div>
+                    <div class="col-auto">
+                        <i class="fas fa-boxes-stacked fa-2x"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-lg-6 mb-4">
-            <div class="dashboard-card h-100">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold"><i class="fas fa-receipt me-2"></i>Active Rentals / Events</h6>
-                    <p>Equipment currently assigned to events</p>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card card-available-items h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Available</div>
+                        <div class="h5 mb-0 font-weight-bold">@_availableItemsCount</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (_activeEvents.Any())
-                    {
-                        <ul class="dashboard-list">
-                            @foreach (var rentalEvent in _activeEvents)
-                            {
-                                <li class="list-item">
-                                    <div class="item-info">
-                                        <span class="item-title">@rentalEvent.ClientName</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card card-rented-items h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Rented Out</div>
+                        <div class="h5 mb-0 font-weight-bold">@_rentedItemsCount</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-truck-loading fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card card-damaged-items h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Damaged</div>
+                        <div class="h5 mb-0 font-weight-bold">@_damagedItemsCount</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold"><i class="fas fa-receipt me-2"></i>Active Rentals / Events</h6>
+                <p>Equipment currently assigned to events</p>
+            </div>
+            <div class="card-body">
+                @if (_activeEvents.Any())
+                {
+                    <ul class="dashboard-list">
+                        @foreach (var rentalEvent in _activeEvents)
+                        {
+                            <li class="list-item">
+                                <div class="item-info">
+                                    <span class="item-title">@rentalEvent.ClientName</span>
                                     <span
-                                            class="item-subtitle">@rentalEvent.EventInventoryItems.Count items • Due: @rentalEvent.EndDate.ToString("yyyy-MM-dd")</span>                                     @* TODO UPDATE THHJIS WHEN I HAVE CREATED RENTAL *@
+                                        class="item-subtitle">@rentalEvent.EventInventoryItems.Count items • Due: @rentalEvent.EndDate.ToString("yyyy-MM-dd")</span> @* TODO UPDATE THHJIS WHEN I HAVE CREATED RENTAL *@
 
-                                    </div>
-                                    <span
-                                        class="badge @GetRentalStatusBadge(rentalEvent.EndDate)">@GetRentalStatusText(rentalEvent.EndDate)</span>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p>No active rentals to display.</p>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <div class="dashboard-card h-100">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold"><i class="fas fa-calendar-alt me-2"></i>Upcoming Events</h6>
-                    <p>Events scheduled for the near future</p>
-                </div>
-                <div class="card-body">
-                    @if (_upcomingEvents.Any())
-                    {
-                        <ul class="dashboard-list">
-                            @foreach (var ev in _upcomingEvents)
-                            {
-                                <li class="list-item">
-                                    <div class="item-info">
-                                        <span class="item-title">@ev.Name</span>
-                                        <span class="item-subtitle">@ev.Location</span>
-                                    </div>
-                                    <span class="event-date">@ev.StartDate.ToString("MMM dd")</span>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p>No upcoming events.</p>
-                    }
-                </div>
+                                </div>
+                                <span
+                                    class="badge @GetRentalStatusBadge(rentalEvent.EndDate)">@GetRentalStatusText(rentalEvent.EndDate)</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No active rentals to display.</p>
+                }
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="dashboard-card h-100">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold"><i class="fas fa-robot me-2"></i>AI Assistant</h6>
-                    <p>Ask quick questions about inventory, events, or rentals.</p>
-                </div>
-                <div class="card-body">
-                    <WarehouseCopilot />
-                </div>
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold"><i class="fas fa-calendar-alt me-2"></i>Upcoming Events</h6>
+                <p>Events scheduled for the near future</p>
+            </div>
+            <div class="card-body">
+                @if (_upcomingEvents.Any())
+                {
+                    <ul class="dashboard-list">
+                        @foreach (var ev in _upcomingEvents)
+                        {
+                            <li class="list-item">
+                                <div class="item-info">
+                                    <span class="item-title">@ev.Name</span>
+                                    <span class="item-subtitle">@ev.Location</span>
+                                </div>
+                                <span class="event-date">@ev.StartDate.ToString("MMM dd")</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No upcoming events.</p>
+                }
             </div>
         </div>
     </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold"><i class="fas fa-robot me-2"></i>AI Assistant</h6>
+                <p>Ask quick questions about inventory, events, or rentals.</p>
+            </div>
+            <div class="card-body">
+                <WarehouseCopilot/>
+            </div>
+        </div>
+    </div>
+</div>
 

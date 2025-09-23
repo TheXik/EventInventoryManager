@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WarehouseManager.Application.Interfaces;
 using WarehouseManager.Core.Entities.Rentals;
-using WarehouseManager.Infrastructure.Data;
 using WarehouseManager.Core.Enums;
+using WarehouseManager.Infrastructure.Data;
 
 namespace WarehouseManager.Infrastructure.Repositories;
 
@@ -71,7 +71,8 @@ public class RentalRepository : IRentalRepository
         foreach (var ri in rental.RentalItems)
         {
             var toReturn = Math.Max(0, ri.QuantityRented - ri.QuantityReturned);
-            var inv = ri.InventoryItem ?? await _context.InventoryItems.FirstOrDefaultAsync(i => i.Id == ri.InventoryItemId);
+            var inv = ri.InventoryItem ??
+                      await _context.InventoryItems.FirstOrDefaultAsync(i => i.Id == ri.InventoryItemId);
             if (inv != null)
             {
                 if (toReturn > 0)
@@ -79,6 +80,7 @@ public class RentalRepository : IRentalRepository
                     inv.AvailableQuantity += toReturn;
                     inv.UpdateAvailabilityStatus();
                 }
+
                 inv.RentalStatus = RentalStatus.NotInRentalUse;
             }
         }

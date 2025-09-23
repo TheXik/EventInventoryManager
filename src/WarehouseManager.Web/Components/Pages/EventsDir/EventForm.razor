@@ -1,6 +1,5 @@
-@using WarehouseManager.Core.Entities
-
-<div class="modal fade @(_showModal ? "show d-block" : "")" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+<div class="modal fade @(_showModal ? "show d-block" : "")" tabindex="-1" role="dialog"
+     style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,18 +8,18 @@
             </div>
             <div class="modal-body">
                 <EditForm Model="@_eventModel" OnValidSubmit="HandleValidSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
+                    <DataAnnotationsValidator/>
+                    <ValidationSummary/>
                     <div class="text-muted small mb-2">Fields marked * are required.</div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Event Title *</label>
-                            <InputText class="form-control" @bind-Value="_eventModel.Name" />
-                            <ValidationMessage For="@(() => _eventModel.Name)" />
+                            <InputText class="form-control" @bind-Value="_eventModel.Name"/>
+                            <ValidationMessage For="@(() => _eventModel.Name)"/>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Location / URL</label>
-                            <InputText class="form-control" @bind-Value="_eventModel.Location" />
+                            <InputText class="form-control" @bind-Value="_eventModel.Location"/>
                         </div>
                     </div>
                     <div class="row">
@@ -30,28 +29,32 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Client Contact</label>
-                            <InputText class="form-control" @bind-Value="_eventModel.ClientContact" title="Client Contact"/>
+                            <InputText class="form-control" @bind-Value="_eventModel.ClientContact"
+                                       title="Client Contact"/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Start Date & Time *</label>
-                            <InputDate Type="InputDateType.DateTimeLocal" class="form-control" @bind-Value="_eventModel.StartDate" />
+                            <InputDate Type="InputDateType.DateTimeLocal" class="form-control"
+                                       @bind-Value="_eventModel.StartDate"/>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">End Date & Time *</label>
-                            <InputDate Type="InputDateType.DateTimeLocal" class="form-control" @bind-Value="_eventModel.EndDate" />
+                            <InputDate Type="InputDateType.DateTimeLocal" class="form-control"
+                                       @bind-Value="_eventModel.EndDate"/>
                         </div>
                     </div>
                     <div class="row">
-                         <div class="col-md-6 mb-3">
-                             <label class="form-label">Category Color</label>
-                             <InputText type="color" class="form-control form-control-color" @bind-Value="_eventModel.Color" title="Choose your color"/>
-                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Category Color</label>
+                            <InputText type="color" class="form-control form-control-color"
+                                       @bind-Value="_eventModel.Color" title="Choose your color"/>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <InputTextArea class="form-control" @bind-Value="_eventModel.Description" rows="4" />
+                        <InputTextArea class="form-control" @bind-Value="_eventModel.Description" rows="4"/>
                     </div>
 
                     <div class="modal-footer">

@@ -1,8 +1,7 @@
-namespace WarehouseManager.Web.Components.Account
+namespace WarehouseManager.Web.Components.Account;
+
+internal static class AppRoutes
 {
-    internal static class AppRoutes
-    {
-        // Centralized application route constants
-        public const string Root = "/";
-    }
+    // Centralized application route constants
+    public const string Root = "/";
 }

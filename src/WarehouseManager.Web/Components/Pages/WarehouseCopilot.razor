@@ -1,37 +1,37 @@
+<div class="page-header">
+    <h1>AI Assistant</h1>
+    <p class="text-muted">Hey! I'm your AI Assistant. What can I help you find or prep for an event today?</p>
+</div>
 
-    <div class="page-header">
-        <h1>AI Assistant</h1>
-        <p class="text-muted">Hey! I'm your AI Assistant. What can I help you find or prep for an event today?</p>
-    </div>
-
-    <div class="row g-3">
-        <div class="col-lg-8">
-            <div class="card chat-card">
-                <div class="card-body chat-window" id="chat-window">
-                    @if (!_messages.Any())
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card chat-card">
+            <div class="card-body chat-window" id="chat-window">
+                @if (!_messages.Any())
+                {
+                    <div class="empty-state">
+                        <p>Ask me about items, availability, events, or rentals. I respond fast and keep it simple.</p>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var m in _messages)
                     {
-                        <div class="empty-state">
-                            <p>Ask me about items, availability, events, or rentals. I respond fast and keep it simple.</p>
+                        <div class="chat-row @(m.FromUser ? "user" : "bot")">
+                            <div class="bubble">
+                                @m.Text
+                            </div>
                         </div>
                     }
-                    else
-                    {
-                        @foreach (var m in _messages)
-                        {
-                            <div class="chat-row @(m.FromUser ? "user" : "bot")">
-                                <div class="bubble">
-                                    @m.Text
-                                </div>
-                            </div>
-                        }
-                    }
-                </div>
-                <div class="card-footer d-flex align-items-center">
-                    <input class="form-control me-2" placeholder="Type your question..." @bind="_draft" @bind:event="oninput" @onkeydown="HandleKeyDown" />
-                    <button class="btn btn-primary" @onclick="Send">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
+                }
+            </div>
+            <div class="card-footer d-flex align-items-center">
+                <input class="form-control me-2" placeholder="Type your question..." @bind="_draft"
+                       @bind:event="oninput" @onkeydown="HandleKeyDown"/>
+                <button class="btn btn-primary" @onclick="Send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
+</div>
