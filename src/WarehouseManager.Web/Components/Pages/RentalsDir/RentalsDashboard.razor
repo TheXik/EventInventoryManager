@@ -1,0 +1,66 @@
+@page "/rentals"
+
+
+<div class="page-container">
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Rentals</h1>
+            <p class="text-muted">Manage external rentals independently from events.</p>
+        </div>
+        <button class="btn btn-primary" @onclick="@(() => Nav.NavigateTo("/rentals/new"))">
+            <i class="fas fa-plus"></i> New Rental
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">All Rentals</h4>
+            <input class="form-control w-auto" placeholder="Search by client..." @bind="_search" />
+        </div>
+        <div class="card-body">
+            @if (_rentals is null)
+            {
+                <div class="loading-spinner"></div>
+            }
+            else if (!_filtered.Any())
+            {
+                <div class="empty-state"><i class="fas fa-clipboard-list"></i><p>No rentals yet.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Return Date</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in _filtered)
+                            {
+                                <tr>
+                                    <td>@r.ClientName</td>
+                                    <td>@r.ExpectedReturnDate.ToShortDateString()</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadge(r)">@r.Status</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge @GetPaymentBadge(r.PaymentStatus)">@r.PaymentStatus</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-secondary me-2" @onclick="@(() => Nav.NavigateTo($"/rentals/{r.RentalId}"))"><i class="fas fa-eye"></i> Details</button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Delete rental" @onclick="@(() => ConfirmAndDelete(r.RentalId))"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
