@@ -2,6 +2,6 @@ namespace WarehouseManager.Core.Enums;
 
 public enum RentalStatus
 {
-    Rentable,
+    Rented,
     NotInRentalUse
 }
