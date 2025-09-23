@@ -44,7 +44,7 @@ public class InventoryItemViewModel
     public DateTime? RentalDate { get; set; }
 
     [Range(0, double.MaxValue, ErrorMessage = "Price must be a non-negative number.")]
-    public decimal RentalPrice { get; set; }
+    public decimal RentalPricePerDay { get; set; }
 
     public string? RentalDescription { get; set; }
     public Condition? Condition { get; set; }

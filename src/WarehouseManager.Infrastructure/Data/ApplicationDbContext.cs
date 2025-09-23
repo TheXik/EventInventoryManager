@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WarehouseManager.Core;
 using WarehouseManager.Core.Entities;
 using WarehouseManager.Core.Entities.InventoryPage;
+using WarehouseManager.Core.Entities.Rentals;
 
 namespace WarehouseManager.Infrastructure.Data;
 
@@ -13,6 +14,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ItemCategory> Categories { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<EventInventoryItem> EventInventoryItems { get; set; }
+
+    // Rentals module
+    public DbSet<Rental> Rentals { get; set; }
+    public DbSet<RentalItem> RentalItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -32,5 +37,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(ei => ei.InventoryItem)
             .WithMany(i => i.EventInventoryItems)
             .HasForeignKey(ei => ei.InventoryItemId);
+
+        // Rentals relationships
+        builder.Entity<RentalItem>()
+            .HasOne(ri => ri.Rental)
+            .WithMany(r => r.RentalItems)
+            .HasForeignKey(ri => ri.RentalId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<RentalItem>()
+            .HasOne(ri => ri.InventoryItem)
+            .WithMany()
+            .HasForeignKey(ri => ri.InventoryItemId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -49,3 +49,40 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+@media print {
+    body, .page {
+      
+        background: #fff !important;
+        display: block !important;
+    }
+
+    .sidebar {
+        display: none !important;
+    }
+
+    .main, .content {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .page-header a,
+    .page-footer,
+    .btn,
+    .back-link,
+    .top-row {
+        display: none !important;
+    }
+
+    .page-header h1 {
+        font-size: 24pt;
+        border-bottom: 2px solid #000;
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}

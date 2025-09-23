@@ -25,7 +25,7 @@ public class InventoryItem
     public int Height { get; set; }
     public int Width { get; set; }
     public TruckLoadingPriority? TruckLoadingPriority { get; set; } // for optimization of truck loading 
-
+    
     //TODO LATER 
 
     // // Image
@@ -34,7 +34,7 @@ public class InventoryItem
     // Rental Information
     public RentalStatus RentalStatus { get; set; }
     public DateTime RentalDate { get; set; }
-    public int RentalPrice { get; set; }
+    public decimal RentalPricePerDay { get; set; }
 
     public string? RentalDescription { get; set; }
 

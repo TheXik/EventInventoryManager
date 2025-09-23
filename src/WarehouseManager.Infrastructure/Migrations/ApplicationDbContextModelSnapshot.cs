@@ -309,8 +309,8 @@ namespace WarehouseManager.Infrastructure.Migrations
                     b.Property<string>("RentalDescription")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("RentalPrice")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal>("RentalPricePerDay")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("RentalStatus")
                         .HasColumnType("INTEGER");
@@ -357,6 +357,76 @@ namespace WarehouseManager.Infrastructure.Migrations
                             Id = 1,
                             Name = "Uncategorized"
                         });
+                });
+
+            modelBuilder.Entity("WarehouseManager.Core.Entities.Rentals.Rental", b =>
+                {
+                    b.Property<int>("RentalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ActualReturnDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClientName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContactInfo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpectedReturnDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("RentalDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("RentalId");
+
+                    b.ToTable("Rentals");
+                });
+
+            modelBuilder.Entity("WarehouseManager.Core.Entities.Rentals.RentalItem", b =>
+                {
+                    b.Property<int>("RentalItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("InventoryItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("PricePerDayAtTimeOfRental")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("QuantityRented")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuantityReturned")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RentalId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("RentalItemId");
+
+                    b.HasIndex("InventoryItemId");
+
+                    b.HasIndex("RentalId");
+
+                    b.ToTable("RentalItems");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -440,6 +510,25 @@ namespace WarehouseManager.Infrastructure.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("WarehouseManager.Core.Entities.Rentals.RentalItem", b =>
+                {
+                    b.HasOne("WarehouseManager.Core.Entities.InventoryPage.InventoryItem", "InventoryItem")
+                        .WithMany()
+                        .HasForeignKey("InventoryItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WarehouseManager.Core.Entities.Rentals.Rental", "Rental")
+                        .WithMany("RentalItems")
+                        .HasForeignKey("RentalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InventoryItem");
+
+                    b.Navigation("Rental");
+                });
+
             modelBuilder.Entity("WarehouseManager.Core.Entities.Event", b =>
                 {
                     b.Navigation("EventInventoryItems");
@@ -448,6 +537,11 @@ namespace WarehouseManager.Infrastructure.Migrations
             modelBuilder.Entity("WarehouseManager.Core.Entities.InventoryPage.InventoryItem", b =>
                 {
                     b.Navigation("EventInventoryItems");
+                });
+
+            modelBuilder.Entity("WarehouseManager.Core.Entities.Rentals.Rental", b =>
+                {
+                    b.Navigation("RentalItems");
                 });
 #pragma warning restore 612, 618
         }

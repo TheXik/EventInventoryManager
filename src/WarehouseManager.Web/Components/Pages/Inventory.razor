@@ -217,7 +217,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Rental Price (€)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice"/>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPricePerDay"/>
                             </div>
                         </div>
 
@@ -380,7 +380,7 @@
                     <h5>Rental Information</h5>
                     <div class="row">
                         <div class="col-md-4"><strong>Rental Status:</strong> @_selectedItem.RentalStatus</div>
-                        <div class="col-md-4"><strong>Rental Price:</strong> @_selectedItem.RentalPrice.ToString("C")
+                        <div class="col-md-4"><strong>Rental Price:</strong> @_selectedItem.RentalPricePerDay.ToString("C")
                         </div>
                         <div class="col-md-4"><strong>Last
                                 Rental:</strong> @_selectedItem.RentalDate.ToShortDateString()</div>
@@ -500,7 +500,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Rental Price (€)</label>
-                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPrice"/>
+                                <InputNumber class="form-control" @bind-Value="_viewModel.RentalPricePerDay"/>
                             </div>
                         </div>
 
@@ -646,14 +646,13 @@
             TruckLoadingPriority = _viewModel.TruckLoadingPriority,
             RentalStatus = _viewModel.RentalStatus,
             RentalDate = _viewModel.RentalDate ?? DateTime.UtcNow,
-            RentalPrice = (int)_viewModel.RentalPrice,
+            RentalPricePerDay = _viewModel.RentalPricePerDay,
             Condition = _viewModel.Condition,
             ConditionDescription = _viewModel.ConditionDescription,
             Category = null
         };
 
         await InventoryRepo.AddAsync(newItem);
-
         await LoadData();
         CloseAddModal();
     }
@@ -677,7 +676,7 @@
         itemToUpdate.Width = _viewModel.Width;
         itemToUpdate.TruckLoadingPriority = _viewModel.TruckLoadingPriority;
         itemToUpdate.RentalStatus = _viewModel.RentalStatus;
-        itemToUpdate.RentalPrice = (int)_viewModel.RentalPrice;
+        itemToUpdate.RentalPricePerDay = _viewModel.RentalPricePerDay;
         itemToUpdate.Condition = _viewModel.Condition;
         itemToUpdate.ConditionDescription = _viewModel.ConditionDescription;
 
@@ -751,7 +750,7 @@
             Width = item.Width,
             TruckLoadingPriority = item.TruckLoadingPriority,
             RentalStatus = item.RentalStatus,
-            RentalPrice = item.RentalPrice,
+            RentalPricePerDay = item.RentalPricePerDay,
             Condition = item.Condition,
             ConditionDescription = item.ConditionDescription
         };
@@ -778,7 +777,6 @@
 
     private string GetConditionBadgeClass(Condition? condition)
     {
-        // Ak je hodnota null, vrátime defaultnú sivú farbu
         if (!condition.HasValue)
         {
             return "badge bg-secondary";
