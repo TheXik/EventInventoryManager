@@ -25,7 +25,7 @@ public partial class Dashboard
         var allEvents = (await eventsTask).ToList();
 
         _totalItems = _allItems.Count;
-        _rentedItemsCount = _allItems.Count(i => i.RentalStatus == RentalStatus.Rented);
+        _rentedItemsCount = _allItems.Count(i => i.AvailableQuantity < i.TotalQuantity);
         _damagedItemsCount = _allItems.Count(i => i.Condition == Condition.Damaged);
         _availableItemsCount = _allItems.Count(i => i.AvailabilityStatus == AvailabilityStatus.Available);
 

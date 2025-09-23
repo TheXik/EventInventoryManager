@@ -49,20 +49,14 @@ public partial class RentalReturn
                 if (line.Damaged)
                 {
                     item.Condition = Condition.Damaged;
-                    item.RentalStatus = RentalStatus.Damaged;
+                    item.RentalStatus = RentalStatus.NotInRentalUse; // damaged items are temporarily not rentable
                     if (!string.IsNullOrWhiteSpace(line.Notes))
                     {
                         item.ConditionDescription = line.Notes;
                     }
                 }
-                else
-                {
-                    // If not damaged, set rental status based on whether any units remain allocated
-                    item.RentalStatus = (item.AvailableQuantity < item.TotalQuantity)
-                        ? RentalStatus.Rented
-                        : RentalStatus.Available;
-                }
 
+                // Update item after changes to availability or condition
                 if (deltaReturned > 0 || line.Damaged)
                 {
                     await InventoryRepository.UpdateAsync(item);

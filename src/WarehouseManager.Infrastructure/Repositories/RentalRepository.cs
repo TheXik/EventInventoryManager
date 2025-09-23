@@ -78,11 +78,8 @@ public class RentalRepository : IRentalRepository
                 if (inv != null)
                 {
                     inv.AvailableQuantity += toReturn;
-                    // Update availability and rental status
+                    // Update availability only; rental program status is independent
                     inv.UpdateAvailabilityStatus();
-                    inv.RentalStatus = (inv.AvailableQuantity < inv.TotalQuantity)
-                        ? RentalStatus.Rented
-                        : RentalStatus.Available;
                 }
             }
         }

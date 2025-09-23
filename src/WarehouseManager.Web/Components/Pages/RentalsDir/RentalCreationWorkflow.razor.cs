@@ -72,8 +72,6 @@ public partial class RentalCreationWorkflow
         if (item.AvailableQuantity <= 0 || _draft == null) return;
         item.AvailableQuantity -= 1;
         item.UpdateAvailabilityStatus();
-        // Mark item as in rental use
-        item.RentalStatus = RentalStatus.Rented;
         await InventoryRepository.UpdateAsync(item);
 
         var existing = _lines.FirstOrDefault(l => l.Item.Id == item.Id);
@@ -130,10 +128,6 @@ public partial class RentalCreationWorkflow
         var item = line.Item;
         item.AvailableQuantity += line.Quantity;
         item.UpdateAvailabilityStatus();
-        // If all units are free, mark as available; otherwise still rented
-        item.RentalStatus = (item.AvailableQuantity < item.TotalQuantity)
-            ? RentalStatus.Rented
-            : RentalStatus.Available;
         await InventoryRepository.UpdateAsync(item);
 
         _lines.Remove(line);
@@ -177,10 +171,6 @@ public partial class RentalCreationWorkflow
             line.Item.AvailableQuantity += (-delta);
         }
         line.Item.UpdateAvailabilityStatus();
-        // Update rental status based on allocation
-        line.Item.RentalStatus = (line.Item.AvailableQuantity < line.Item.TotalQuantity)
-            ? RentalStatus.Rented
-            : RentalStatus.Available;
         await InventoryRepository.UpdateAsync(line.Item);
 
         line.Quantity = newQty;
