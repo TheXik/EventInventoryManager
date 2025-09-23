@@ -93,6 +93,9 @@
             <div class="page-footer">
                 <button type="button" class="btn btn-secondary" @onclick='() => _NavigationManager.NavigateTo("/events")'>Cancel</button>
                 <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+                <button type="button" class="btn btn-primary" title="Prepare Loading Plan" @onclick='() => _NavigationManager.NavigateTo($"/event-loading/{EventId}")'>
+                    <i class="fas fa-truck"></i> Prepare for Loading
+                </button>
             </div>
         </EditForm>
     }

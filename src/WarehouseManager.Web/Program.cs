@@ -55,9 +55,15 @@ builder.Services.AddScoped<IEventRepository, EventRepository>();
 //Event inventory manager
 builder.Services.AddScoped<IEventInventoryItemRepository, EventInventoryItemRepository>();
 
+// Rentals module
+builder.Services.AddScoped<IRentalRepository, RentalRepository>();
+builder.Services.AddScoped<IRentalItemRepository, RentalItemRepository>();
 
 builder.Services.AddRadzenComponents();
 
+// AI chat service
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IChatAiService, ChatAiService>();
 
 var app = builder.Build();
 
