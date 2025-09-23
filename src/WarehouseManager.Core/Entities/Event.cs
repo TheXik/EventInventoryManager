@@ -10,6 +10,7 @@ public class Event
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string? ClientName { get; set; }
+    public string? ClientContact { get; set; }
     public string? Location { get; set; }
 
 

@@ -1,15 +1,17 @@
-.inventory-page-container {
-    padding: 2rem;
-    border-radius: 8px;
+
+
+.page-header{
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #dee2e6;
+
 }
 
-.page-header {
+.page-inventory-title-button{
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #dee2e6;
 }
 
 .page-header-title h1 {
@@ -26,6 +28,11 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    
+
+}
+.btn-add-item:hover{
+    background-color: #0037f5;
 }
 
 

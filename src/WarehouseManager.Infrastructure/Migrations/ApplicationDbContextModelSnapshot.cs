@@ -218,6 +218,9 @@ namespace WarehouseManager.Infrastructure.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClientContact")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClientName")
                         .HasColumnType("TEXT");
 

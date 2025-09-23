@@ -24,6 +24,16 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <label class="form-label">Client Name</label>
+                            <InputText class="form-control" @bind-Value="_eventModel.ClientName" title="Client Name"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Client Contact</label>
+                            <InputText class="form-control" @bind-Value="_eventModel.ClientContact" title="Client Contact"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Start Date & Time</label>
                             <InputDate Type="InputDateType.DateTimeLocal" class="form-control" @bind-Value="_eventModel.StartDate" />
                         </div>

@@ -1,6 +1,6 @@
 .event-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 1.5rem;
 }
 
@@ -41,13 +41,14 @@
 
 .card-title {
     margin-top: 0;
+    font-size: 1.3rem;
     margin-bottom: 1rem;
     color: #333;
 }
 
 .card-detail {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 1.1rem;
+    color: #000000;
     margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
