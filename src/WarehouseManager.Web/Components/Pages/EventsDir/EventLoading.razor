@@ -1,0 +1,118 @@
+@page "/event-loading/{EventId:int}"
+@using WarehouseManager.Core.Enums
+
+    @if (_event == null)
+    {
+        <div class="loading-spinner"></div>
+    }
+    else
+    {
+        <div class="page-header">
+            <a href="/events" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Events
+            </a>
+            <h1>Loading Plan</h1>
+            <p class="text-muted">Set the priority for loading items into the van.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="event-details-list">
+                    <p>
+                        <i class="fas fa-location-pin fa-fw"></i>
+                        <strong>Event:</strong> @_event.Name &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Location:</strong> @_event.Location
+                    </p>
+                    <p>
+                        <i class="fas fa-user-circle fa-fw"></i>
+                        <strong>Client:</strong> @_event.ClientName &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Contact:</strong> @_event.ClientContact
+                    </p>
+                    <p>
+                        <i class="fas fa-calendar fa-fw"></i>
+                        <strong>Start:</strong> @_event.StartDate.ToString("MMM d, HH:mm") &nbsp;&nbsp;|&nbsp;&nbsp; <strong>End:</strong> @_event.EndDate.ToString("MMM d, HH:mm")
+                    </p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-secondary me-2" @onclick="BackToInventory">
+                        <i class="fas fa-boxes"></i> Back to Inventory
+                    </button>
+                    <button class="btn btn-success me-2" @onclick="SavePriorities">
+                        <i class="fas fa-save">
+
+                        </i> Save Priorities</button>
+                    <button class="btn btn-primary" @onclick="DownloadList">
+                        <i class="fas fa-file-pdf">
+
+                        </i> Download List</button>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (!_rows.Any())
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No items have been selected for this event.</p>
+                        <small>Go back to inventory to add items to this event.</small>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle" id="loading-plan-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">Priority</th>
+                                    <th>Item Name</th>
+                                    <th style="width: 140px;">Quantity</th>
+                                    <th style="width: 120px;" class="d-print-table-cell">Loaded</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var row in SortedRows)
+                                {
+
+                                    <tr >
+                                        <td>
+                                            <InputSelect class="form-select" @bind-Value="row.SelectedPriority">
+                                                @foreach (var pr in Enum.GetValues<TruckLoadingPriority>())
+                                                {
+                                                    <option value="@pr">@pr</option>
+                                                }
+                                            </InputSelect>
+                                        </td>
+                                        <td>@row.Item.Name</td>
+                                        <td>@row.Quantity</td>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="page-footer d-print-none">
+            <button class="btn btn-secondary" @onclick='() => NavigationManager.NavigateTo("/events")'>
+                Cancel
+            </button>
+            <button class="btn btn-success" @onclick="SavePriorities">
+                <i class="fas fa-check"></i> Save Priorities
+            </button>
+            <button class="btn btn-primary" @onclick="DownloadList">
+                <i class="fas fa-file-pdf"></i> Download List
+            </button>
+        </div>
+    }
+
+
+
+<style>
+    @@media print {
+        .page-header, .page-footer, .btn, .back-link { display: none !important; }
+        .card { border: none; }
+        #loading-plan-table { font-size: 12px; }
+        th, td { padding: 6px 8px; }
+    }
+</style>
