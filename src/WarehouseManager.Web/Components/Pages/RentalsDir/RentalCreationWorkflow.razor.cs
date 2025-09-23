@@ -213,6 +213,12 @@ public partial class RentalCreationWorkflow
         }).ToList();
         await RentalRepository.UpdateAsync(_draft);
 
+        foreach (var line in _lines)
+        {
+            line.Item.RentalStatus = RentalStatus.Rented;
+            await InventoryRepository.UpdateAsync(line.Item);
+        }
+
         Nav.NavigateTo($"/rentals/{_draft.RentalId}");
     }
 

@@ -71,16 +71,15 @@ public class RentalRepository : IRentalRepository
         foreach (var ri in rental.RentalItems)
         {
             var toReturn = Math.Max(0, ri.QuantityRented - ri.QuantityReturned);
-            if (toReturn > 0)
+            var inv = ri.InventoryItem ?? await _context.InventoryItems.FirstOrDefaultAsync(i => i.Id == ri.InventoryItemId);
+            if (inv != null)
             {
-                // Fetch inventory item (attached or reload if null)
-                var inv = ri.InventoryItem ?? await _context.InventoryItems.FirstOrDefaultAsync(i => i.Id == ri.InventoryItemId);
-                if (inv != null)
+                if (toReturn > 0)
                 {
                     inv.AvailableQuantity += toReturn;
-                    // Update availability only; rental program status is independent
                     inv.UpdateAvailabilityStatus();
                 }
+                inv.RentalStatus = RentalStatus.NotInRentalUse;
             }
         }
 
