@@ -15,6 +15,9 @@
         </div>
 
         <EditForm Model="this" OnValidSubmit="ConfirmReturn">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="text-muted small mb-2">Fields marked * are required.</div>
             <div class="card">
                 <div class="card-header"><h4>Items</h4></div>
                 <div class="card-body">
@@ -24,7 +27,7 @@
                             <tr>
                                 <th>Item</th>
                                 <th>Qty Rented</th>
-                                <th>Qty Returned</th>
+                                <th>Qty Returned *</th>
                                 <th>Damaged</th>
                                 <th>Notes</th>
                             </tr>

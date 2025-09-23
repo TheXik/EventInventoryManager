@@ -14,11 +14,13 @@
     {
         <EditForm Model="_model" OnValidSubmit="GoToStep2">
             <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="text-muted small mb-2">Fields marked * are required.</div>
             <div class="card">
                 <div class="card-header"><h4>Step 1: Client & Dates</h4></div>
                 <div class="card-body row g-3">
                     <div class="col-md-6">
-                        <label>Client Name</label>
+                        <label>Client Name *</label>
                         <InputText class="form-control" @bind-Value="_model.ClientName" />
                     </div>
                     <div class="col-md-6">
@@ -26,11 +28,11 @@
                         <InputText class="form-control" @bind-Value="_model.ContactInfo" />
                     </div>
                     <div class="col-md-4">
-                        <label>Rental Date</label>
+                        <label>Rental Date *</label>
                         <InputDate class="form-control" @bind-Value="_model.RentalDate" />
                     </div>
                     <div class="col-md-4">
-                        <label>Expected Return</label>
+                        <label>Expected Return *</label>
                         <InputDate class="form-control" @bind-Value="_model.ExpectedReturnDate" />
                     </div>
                     <div class="col-md-4">

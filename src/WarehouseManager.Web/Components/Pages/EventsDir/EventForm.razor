@@ -11,9 +11,11 @@
             <div class="modal-body">
                 <EditForm Model="@_eventModel" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="text-muted small mb-2">Fields marked * are required.</div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Event Title</label>
+                            <label class="form-label">Event Title *</label>
                             <InputText class="form-control" @bind-Value="_eventModel.Name" />
                             <ValidationMessage For="@(() => _eventModel.Name)" />
                         </div>
@@ -34,11 +36,11 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Start Date & Time</label>
+                            <label class="form-label">Start Date & Time *</label>
                             <InputDate Type="InputDateType.DateTimeLocal" class="form-control" @bind-Value="_eventModel.StartDate" />
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">End Date & Time</label>
+                            <label class="form-label">End Date & Time *</label>
                             <InputDate Type="InputDateType.DateTimeLocal" class="form-control" @bind-Value="_eventModel.EndDate" />
                         </div>
                     </div>
