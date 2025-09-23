@@ -8,13 +8,20 @@
 
 @inject IInventoryItemRepository InventoryRepo
 @inject ICategoryRepository CategoryRepo
-
+@inject IJSRuntime JS
 
 
 @attribute [Authorize]
 
 <PageTitle>Inventory Dashboard</PageTitle>
 
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @_errorMessage
+        <button type="button" class="btn-close" @onclick="()=>_errorMessage=null" aria-label="Close"></button>
+    </div>
+}
 
     @* TITLE AND ADD BUTTON *@
     <div class="page-header">
@@ -126,13 +133,15 @@
                 <div class="modal-body">
                     <EditForm Model="@_viewModel" OnValidSubmit="HandleValidSubmit">
                         <DataAnnotationsValidator/>
+                        <ValidationSummary />
+                        <div class="text-muted small mb-2">Fields marked * are required.</div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Name</label>
+                                <label class="form-label">Name *</label>
                                 <InputText class="form-control" @bind-Value="_viewModel.Name"/>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Quantity</label>
+                                <label class="form-label">Quantity *</label>
                                 <InputNumber class="form-control" @bind-Value="_viewModel.Quantity"/>
                             </div>
                         </div>
@@ -143,7 +152,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Category</label>
+                            <label class="form-label">Category *</label>
                             <InputSelect class="form-select" @bind-Value="_viewModel.CategoryId">
                                 @* The default "Uncategorized" value is set in the OpenAddModal method *@
                                 @foreach (var category in _categories)
@@ -416,14 +425,16 @@
                 <div class="modal-body">
                     <EditForm Model="@_viewModel" OnValidSubmit="HandleUpdateSubmit">
                         <DataAnnotationsValidator/>
+                        <ValidationSummary />
+                        <div class="text-muted small mb-2">Fields marked * are required.</div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Name</label>
+                                <label class="form-label">Name *</label>
                                 <InputText class="form-control" @bind-Value="_viewModel.Name"/>
                                 <ValidationMessage For="@(() => _viewModel.Name)"/>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Quantity</label>
+                                <label class="form-label">Quantity *</label>
                                 <InputNumber class="form-control" @bind-Value="_viewModel.Quantity"/>
                                 <ValidationMessage For="@(() => _viewModel.Quantity)"/>
                             </div>
@@ -435,7 +446,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Category</label>
+                            <label class="form-label">Category *</label>
                             <InputSelect class="form-select" @bind-Value="_viewModel.CategoryId">
                                 @* We no longer need the "-- Select --" option here *@
                                 @foreach (var category in _categories)
@@ -550,6 +561,7 @@
     private InventoryItem? _selectedItem; // To store the item being viewed
     private List<ItemCategory> _categories = new(); // For the dropdown
     private InventoryItemViewModel _viewModel = new();
+    private string? _errorMessage;
 
     private InventoryFilterViewModel _filters = new();
 
@@ -620,77 +632,113 @@
 
     private async Task HandleValidSubmit()
     {
-        if (_viewModel.CategoryId == -1)
+        try
         {
-            if (string.IsNullOrWhiteSpace(_viewModel.NewCategoryName))
+            if (_viewModel.CategoryId == -1)
             {
-                // TODO: Add a proper validation message to the UI
-                return;
+                if (string.IsNullOrWhiteSpace(_viewModel.NewCategoryName))
+                {
+                    _errorMessage = "Please provide a name for the new category.";
+                    return;
+                }
+
+                var newCategory = new ItemCategory { Name = _viewModel.NewCategoryName };
+                var createdCategory = await CategoryRepo.AddAsync(newCategory);
+                _viewModel.CategoryId = createdCategory.Id;
             }
 
-            var newCategory = new ItemCategory { Name = _viewModel.NewCategoryName };
-            var createdCategory = await CategoryRepo.AddAsync(newCategory);
-            _viewModel.CategoryId = createdCategory.Id;
+            var newItem = new InventoryItem
+            {
+                Name = _viewModel.Name,
+                Description = _viewModel.Description,
+                AvailableQuantity = _viewModel.Quantity,
+                TotalQuantity = _viewModel.Quantity,
+                CategoryId = _viewModel.CategoryId,
+                AvailabilityStatus = _viewModel.AvailabilityStatus,
+                Weight = _viewModel.Weight,
+                Height = _viewModel.Height,
+                Width = _viewModel.Width,
+                TruckLoadingPriority = _viewModel.TruckLoadingPriority,
+                RentalStatus = _viewModel.RentalStatus,
+                RentalDate = _viewModel.RentalDate ?? DateTime.UtcNow,
+                RentalPricePerDay = _viewModel.RentalPricePerDay,
+                Condition = _viewModel.Condition,
+                ConditionDescription = _viewModel.ConditionDescription,
+                Category = null
+            };
+
+            await InventoryRepo.AddAsync(newItem);
+            await LoadData();
+            _errorMessage = null;
+            CloseAddModal();
         }
-
-        var newItem = new InventoryItem
+        catch (Exception ex)
         {
-            Name = _viewModel.Name,
-            Description = _viewModel.Description,
-            AvailableQuantity = _viewModel.Quantity,
-            TotalQuantity = _viewModel.Quantity,
-            CategoryId = _viewModel.CategoryId,
-            AvailabilityStatus = _viewModel.AvailabilityStatus,
-            Weight = _viewModel.Weight,
-            Height = _viewModel.Height,
-            Width = _viewModel.Width,
-            TruckLoadingPriority = _viewModel.TruckLoadingPriority,
-            RentalStatus = _viewModel.RentalStatus,
-            RentalDate = _viewModel.RentalDate ?? DateTime.UtcNow,
-            RentalPricePerDay = _viewModel.RentalPricePerDay,
-            Condition = _viewModel.Condition,
-            ConditionDescription = _viewModel.ConditionDescription,
-            Category = null
-        };
-
-        await InventoryRepo.AddAsync(newItem);
-        await LoadData();
-        CloseAddModal();
+            _errorMessage = $"Failed to add item: {ex.Message}";
+        }
     }
 
     private async Task HandleUpdateSubmit()
     {
-        var itemToUpdate = _allItems?.FirstOrDefault(i => i.Id == _viewModel.Id);
-        if (itemToUpdate is null)
+        try
         {
-            // TODO: Handle error - item not found
-            return;
+            var itemToUpdate = _allItems?.FirstOrDefault(i => i.Id == _viewModel.Id);
+            if (itemToUpdate is null)
+            {
+                _errorMessage = "The item you are trying to update was not found.";
+                return;
+            }
+
+            itemToUpdate.Name = _viewModel.Name;
+            itemToUpdate.Description = _viewModel.Description;
+            itemToUpdate.TotalQuantity = _viewModel.Quantity;
+            itemToUpdate.CategoryId = _viewModel.CategoryId;
+            itemToUpdate.AvailabilityStatus = _viewModel.AvailabilityStatus;
+            itemToUpdate.Weight = _viewModel.Weight;
+            itemToUpdate.Height = _viewModel.Height;
+            itemToUpdate.Width = _viewModel.Width;
+            itemToUpdate.TruckLoadingPriority = _viewModel.TruckLoadingPriority;
+            itemToUpdate.RentalStatus = _viewModel.RentalStatus;
+            itemToUpdate.RentalPricePerDay = _viewModel.RentalPricePerDay;
+            itemToUpdate.Condition = _viewModel.Condition;
+            itemToUpdate.ConditionDescription = _viewModel.ConditionDescription;
+
+            await InventoryRepo.UpdateAsync(itemToUpdate);
+
+            await LoadData();
+            _errorMessage = null;
+            CloseEditItemModal();
         }
-
-        itemToUpdate.Name = _viewModel.Name;
-        itemToUpdate.Description = _viewModel.Description;
-        itemToUpdate.TotalQuantity = _viewModel.Quantity;
-        itemToUpdate.CategoryId = _viewModel.CategoryId;
-        itemToUpdate.AvailabilityStatus = _viewModel.AvailabilityStatus;
-        itemToUpdate.Weight = _viewModel.Weight;
-        itemToUpdate.Height = _viewModel.Height;
-        itemToUpdate.Width = _viewModel.Width;
-        itemToUpdate.TruckLoadingPriority = _viewModel.TruckLoadingPriority;
-        itemToUpdate.RentalStatus = _viewModel.RentalStatus;
-        itemToUpdate.RentalPricePerDay = _viewModel.RentalPricePerDay;
-        itemToUpdate.Condition = _viewModel.Condition;
-        itemToUpdate.ConditionDescription = _viewModel.ConditionDescription;
-
-        await InventoryRepo.UpdateAsync(itemToUpdate);
-
-        await LoadData();
-        CloseEditItemModal();
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to update item: {ex.Message}";
+        }
     }
 
     private async Task DeleteItem(InventoryItem item)
     {
-        await InventoryRepo.DeleteAsync(item.Id);
-        await LoadData();
+        try
+        {
+            // Pre-check active rental references
+            var activeRefs = await InventoryRepo.CountActiveRentalReferencesAsync(item.Id);
+            if (activeRefs > 0)
+            {
+                var confirm = await JS.InvokeAsync<bool>("confirm", $"This item is included in {activeRefs} active rental(s). If you delete it, those rental records may be affected. Are you sure you want to proceed?");
+                if (!confirm) return;
+            }
+
+            await InventoryRepo.DeleteAsync(item.Id);
+            await LoadData();
+            _errorMessage = null;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to delete item: {ex.Message}";
+        }
     }
 
     // MODAL OPENING AND CLOSING FUNCTIONS

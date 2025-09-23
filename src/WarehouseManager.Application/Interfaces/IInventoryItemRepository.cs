@@ -9,4 +9,5 @@ public interface IInventoryItemRepository
     Task AddAsync(InventoryItem item);
     Task UpdateAsync(InventoryItem item);
     Task DeleteAsync(int id);
+    Task<int> CountActiveRentalReferencesAsync(int inventoryItemId);
 }

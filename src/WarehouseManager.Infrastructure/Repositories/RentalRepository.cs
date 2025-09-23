@@ -40,7 +40,20 @@ public class RentalRepository : IRentalRepository
 
     public async Task UpdateAsync(Rental rental)
     {
-        _context.Entry(rental).State = EntityState.Modified;
+        // Update only scalar properties to avoid unintended changes to navigation collections (RentalItems, InventoryItem)
+        _context.Rentals.Attach(rental);
+        var entry = _context.Entry(rental);
+
+        entry.Property(r => r.ClientName).IsModified = true;
+        entry.Property(r => r.ContactInfo).IsModified = true;
+        entry.Property(r => r.RentalDate).IsModified = true;
+        entry.Property(r => r.ExpectedReturnDate).IsModified = true;
+        entry.Property(r => r.ActualReturnDate).IsModified = true;
+        entry.Property(r => r.Status).IsModified = true;
+        entry.Property(r => r.PaymentStatus).IsModified = true;
+        entry.Property(r => r.DiscountPercentage).IsModified = true;
+        entry.Property(r => r.Notes).IsModified = true;
+
         await _context.SaveChangesAsync();
     }
 

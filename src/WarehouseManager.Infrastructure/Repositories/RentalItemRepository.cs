@@ -37,7 +37,13 @@ public class RentalItemRepository : IRentalItemRepository
 
     public async Task UpdateAsync(RentalItem rentalItem)
     {
-        _context.RentalItems.Update(rentalItem);
+        // Update only scalar properties; avoid changing navigation or foreign keys inadvertently
+        _context.RentalItems.Attach(rentalItem);
+        var entry = _context.Entry(rentalItem);
+        entry.Property(ri => ri.QuantityRented).IsModified = true;
+        entry.Property(ri => ri.QuantityReturned).IsModified = true;
+        entry.Property(ri => ri.PricePerDayAtTimeOfRental).IsModified = true;
+        // Do not modify RentalId/InventoryItemId here to avoid relationship issues
         await _context.SaveChangesAsync();
     }
 
