@@ -59,7 +59,7 @@ public partial class WarehouseCopilot
             // Inventory: include all items with full status
             var itemLines = items
                 .OrderBy(i => i.Name)
-                .Select(i => $"- {i.Id} | {i.Name} | Avail: {i.AvailableQuantity}/{i.TotalQuantity} | Availability: {i.AvailabilityStatus} | RentalStatus: {i.RentalStatus} | Condition: {i.Condition} |  {(string.IsNullOrWhiteSpace(i.ConditionDescription) ? string.Empty : "(" + i.ConditionDescription + ")")}");
+                .Select(i => $"- {i.Id} | {i.Name} | Avail: {i.AvailableQuantity}/{i.TotalQuantity} | Availability: {i.AvailabilityStatus} | RentalStatus: {i.RentalStatus} | Condition: {i.Condition} |  {(string.IsNullOrWhiteSpace(i.ConditionDescription) ? string.Empty : $"({i.ConditionDescription})")}");
 
             // Events: include items per event
             var eventBlocks = eventsList
@@ -76,7 +76,7 @@ public partial class WarehouseCopilot
                 .OrderBy(r => r.ExpectedReturnDate)
                 .Select(r => new
                 {
-                    Header = $"- RENTAL #{r.RentalId}: {r.ClientName} | Status:{r.Status} | Payment:{r.PaymentStatus} | Dates: {r.RentalDate:yyyy-MM-dd} → {r.ExpectedReturnDate:yyyy-MM-dd}{(r.ActualReturnDate.HasValue ? " (Returned:" + r.ActualReturnDate.Value.ToString("yyyy-MM-dd") + ")" : string.Empty)}",
+                    Header = $"- RENTAL #{r.RentalId}: {r.ClientName} | Status:{r.Status} | Payment:{r.PaymentStatus} | Dates: {r.RentalDate:yyyy-MM-dd} → {r.ExpectedReturnDate:yyyy-MM-dd}{(r.ActualReturnDate.HasValue ? $" (Returned:{r.ActualReturnDate.Value:yyyy-MM-dd})" : string.Empty)}",
                     Lines = (r.RentalItems ?? new List<WarehouseManager.Core.Entities.Rentals.RentalItem>())
                         .Select(ri => $"    • ItemId:{ri.InventoryItemId} QtyRented:{ri.QuantityRented} QtyReturned:{ri.QuantityReturned} Price/Day:{ri.PricePerDayAtTimeOfRental}")
                 });
@@ -126,7 +126,7 @@ public partial class WarehouseCopilot
         catch
         {
             // Fallback: still enforce non-fabrication even if context fetch fails
-            return SystemPrompt + "\nRULE: If you lack data, say so. Do not fabricate details.";
+            return $"{SystemPrompt}\nRULE: If you lack data, say so. Do not fabricate details.";
         }
     }
 

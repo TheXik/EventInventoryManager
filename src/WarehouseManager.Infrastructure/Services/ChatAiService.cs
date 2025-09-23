@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using WarehouseManager.Application.Interfaces;
 
 namespace WarehouseManager.Infrastructure.Services
@@ -8,12 +8,12 @@ namespace WarehouseManager.Infrastructure.Services
     public class ChatAiService : IChatAiService
     {
         private readonly HttpClient _http;
-        private readonly IConfiguration _config;
+        private readonly GeminiOptions _options;
 
-        public ChatAiService(HttpClient http, IConfiguration config)
+        public ChatAiService(HttpClient http, IOptions<GeminiOptions> options)
         {
             _http = http;
-            _config = config;
+            _options = options.Value;
         }
 
         public async Task<string> AskAsync(
@@ -21,11 +21,8 @@ namespace WarehouseManager.Infrastructure.Services
             IEnumerable<(bool fromUser, string text)> history, 
             string userInput, CancellationToken ct = default)
         {
-            // Prefer configuration key, fallback to env var
-            var apiKey = _config["Gemini:ApiKey"]
-                         ?? _config["GoogleAI:ApiKey"]
-                         ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY");
-            var model = _config["Gemini:Model"] ?? _config["GoogleAI:Model"] ?? "gemini-2.0-flash";
+            var apiKey = _options.ApiKey ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+            var model = string.IsNullOrWhiteSpace(_options.Model) ? "gemini-2.0-flash" : _options.Model;
             if (string.IsNullOrWhiteSpace(apiKey))
             {
                 return "AI is not configured. Set GEMINI_API_KEY env var or Gemini:ApiKey in appsettings.";
@@ -38,7 +35,6 @@ namespace WarehouseManager.Infrastructure.Services
             // Build contents from history and current user input
             var contents = new List<object>();
 
-            // TODO CHANGE
             var systemInstruction = new
             {
                 parts = new[] { new { text = systemPrompt } }

@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using System;
-using System.Threading.Tasks;
 using WarehouseManager.Core.Entities;
-using WarehouseManager.Web.ViewModels; // Keep this for potential future use
 
 namespace WarehouseManager.Web.Components.Pages.EventsDir
 {

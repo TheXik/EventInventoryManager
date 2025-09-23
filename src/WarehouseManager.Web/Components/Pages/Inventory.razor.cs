@@ -1,10 +1,59 @@
-using EventInventoryManager.ViewModels;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.JSInterop;
 using WarehouseManager.Core.Entities.InventoryPage;
 using WarehouseManager.Core.Enums;
-using WarehouseManager.Web.ViewModels;
 
 namespace WarehouseManager.Web.Components.Pages;
+
+//  view model keep within the UI layer
+internal class InventoryItemViewModel
+{
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(100, ErrorMessage = "Name is too long.")]
+    public string Name { get; set; } = string.Empty;
+
+    [StringLength(500, ErrorMessage = "Description is too long.")]
+    public string? Description { get; set; }
+
+    [Range(0, int.MaxValue, ErrorMessage = "Quantity must be a non-negative number.")]
+    public int Quantity { get; set; }
+
+    public int CategoryId { get; set; }
+
+    // Only used if user creates a new category
+    public string? NewCategoryName { get; set; }
+
+    public AvailabilityStatus AvailabilityStatus { get; set; } = AvailabilityStatus.Available;
+
+    [Range(0, int.MaxValue, ErrorMessage = "Weight must be a non-negative number.")]
+    public int Weight { get; set; }
+
+    [Range(0, int.MaxValue, ErrorMessage = "Dimensions must be non-negative.")]
+    public int Height { get; set; }
+
+    [Range(0, int.MaxValue, ErrorMessage = "Dimensions must be non-negative.")]
+    public int Width { get; set; }
+
+    public TruckLoadingPriority? TruckLoadingPriority { get; set; }
+    public RentalStatus RentalStatus { get; set; } = RentalStatus.NotInRentalUse;
+    public DateTime? RentalDate { get; set; }
+
+    [Range(0, double.MaxValue, ErrorMessage = "Price must be a non-negative number.")]
+    public decimal RentalPricePerDay { get; set; }
+
+    public string? RentalDescription { get; set; }
+    public Condition? Condition { get; set; }
+    public string? ConditionDescription { get; set; }
+}
+
+internal class InventoryFilterViewModel
+{
+    public HashSet<int> SelectedCategoryIds { get; set; } = new();
+    public HashSet<AvailabilityStatus> SelectedAvailabilityStatuses { get; set; } = new();
+    public HashSet<Condition> SelectedConditions { get; set; } = new();
+}
 
 public partial class Inventory
 {
@@ -31,7 +80,7 @@ public partial class Inventory
                 return Enumerable.Empty<InventoryItem>();
             }
 
-            var query = _allItems.AsQueryable();
+            var query = _allItems.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(_searchQuery))
             {

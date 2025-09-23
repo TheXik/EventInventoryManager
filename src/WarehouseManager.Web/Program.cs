@@ -63,6 +63,16 @@ builder.Services.AddRadzenComponents();
 
 // AI chat service
 builder.Services.AddHttpClient();
+// Configure Gemini options
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
+// Fallback to legacy GoogleAI section if Gemini not specified
+builder.Services.PostConfigure<GeminiOptions>(opt =>
+{
+    if (string.IsNullOrWhiteSpace(opt.ApiKey))
+        opt.ApiKey = builder.Configuration["GoogleAI:ApiKey"];
+    if (string.IsNullOrWhiteSpace(opt.Model))
+        opt.Model = builder.Configuration["GoogleAI:Model"];
+});
 builder.Services.AddScoped<IChatAiService, ChatAiService>();
 
 var app = builder.Build();
