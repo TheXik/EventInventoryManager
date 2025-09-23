@@ -1,0 +1,60 @@
+@page "/rentals/{RentalId:int}/return"
+
+    @if (_rental == null)
+    {
+        <div class="loading-spinner"></div>
+    }
+    else
+    {
+        <div class="page-header">
+            <a class="back-link" href="/rentals">
+                <i class="fas fa-arrow-left"></i> Back to Rentals
+            </a>
+            <h1>Process Return</h1>
+            <p class="text-muted">Client: <strong>@_rental.ClientName</strong></p>
+        </div>
+
+        <EditForm Model="this" OnValidSubmit="ConfirmReturn">
+            <div class="card">
+                <div class="card-header"><h4>Items</h4></div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty Rented</th>
+                                <th>Qty Returned</th>
+                                <th>Damaged</th>
+                                <th>Notes</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var line in _lines)
+                            {
+                                <tr>
+                                    <td>@line.RentalItem.InventoryItem?.Name</td>
+                                    <td>@line.RentalItem.QuantityRented</td>
+                                    <td>
+                                        <InputNumber class="form-control" @bind-Value="line.ReturnQty" min="0" max="@line.RentalItem.QuantityRented"/>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" class="form-check-input" @bind="line.Damaged"/>
+                                    </td>
+                                    <td>
+                                        <InputText class="form-control" @bind-Value="line.Notes"/>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-secondary" type="button" @onclick='() => Nav.NavigateTo($"/rentals/{RentalId}")'>Cancel</button>
+                <button class="btn btn-success" type="submit">Confirm Return</button>
+            </div>
+        </EditForm>
+    }

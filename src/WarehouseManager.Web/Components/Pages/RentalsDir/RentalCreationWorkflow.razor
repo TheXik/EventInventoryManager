@@ -1,0 +1,147 @@
+@page "/rentals/new"
+@using WarehouseManager.Core.Entities.Rentals
+@using WarehouseManager.Core.Entities.InventoryPage
+@using WarehouseManager.Core.Enums
+@using WarehouseManager.Application.Interfaces
+
+<div class="page-container">
+    <div class="page-header">
+        <a class="back-link" href="/rentals"><i class="fas fa-arrow-left"></i> Back to Rentals</a>
+        <h1>New Rental</h1>
+    </div>
+
+    @if (_step == 1)
+    {
+        <EditForm Model="_model" OnValidSubmit="GoToStep2">
+            <DataAnnotationsValidator />
+            <div class="card">
+                <div class="card-header"><h4>Step 1: Client & Dates</h4></div>
+                <div class="card-body row g-3">
+                    <div class="col-md-6">
+                        <label>Client Name</label>
+                        <InputText class="form-control" @bind-Value="_model.ClientName" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Contact Info</label>
+                        <InputText class="form-control" @bind-Value="_model.ContactInfo" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Rental Date</label>
+                        <InputDate class="form-control" @bind-Value="_model.RentalDate" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Expected Return</label>
+                        <InputDate class="form-control" @bind-Value="_model.ExpectedReturnDate" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Discount %</label>
+                        <InputNumber class="form-control" @bind-Value="_model.DiscountPercentage" />
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </div>
+            </div>
+        </EditForm>
+    }
+    else if (_step == 2 && _draft != null)
+    {
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Step 2: Add Items</h4>
+                        <div class="text-muted">@_days days</div>
+                    </div>
+                    <div class="card-body">
+                        <input class="form-control mb-3" placeholder="Search items..." @bind="_search" />
+                        <div class="items-scroller">
+                            @foreach (var item in _available)
+                            {
+                                <div class="inventory-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@item.Name</strong>
+                                        <small class="text-muted"> @item.AvailableQuantity avail · @Eur(EffectivePrice(item))/day</small>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-primary" disabled="@(item.AvailableQuantity <= 0)" @onclick="@(() => AddItem(item))"><i class="fas fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-3">
+                    <div class="card-header"><h5>Selected Items</h5></div>
+                    <div class="card-body">
+                        @if (!_lines.Any())
+                        {
+                            <div class="empty-state"><i class="fas fa-box-open"></i><p>No items selected.</p></div>
+                        }
+                        else
+                        {
+                            @foreach (var line in _lines)
+                            {
+                                <div class="inventory-item selected-item">
+                                    <div class="d-flex justify-content-between w-100 align-items-center">
+                                        <div>
+                                            <div><strong>@line.Item.Name</strong></div>
+                                            <small class="text-muted">@Eur(line.PricePerDay)/day</small>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <InputNumber class="form-control quantity-input me-2" @bind-Value="line.Quantity" min="1" max="@(line.Item.AvailableQuantity + line.Quantity)" @oninput="@((ChangeEventArgs e) => OnQtyChange(line, e))" />
+                                            <button class="btn btn-sm btn-outline-danger" @onclick="@(() => RemoveLine(line))"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="text-end small">Line Total: <strong>@Eur(line.Quantity * line.PricePerDay * _days)</strong></div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h5>Financial Summary</h5></div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between"><span>Subtotal</span><strong>@Eur(Subtotal)</strong></div>
+                        <div class="d-flex justify-content-between"><span>Discount</span><strong>-@Eur(Discount)</strong></div>
+                        <div class="d-flex justify-content-between"><span>Total</span><strong>@Eur(Total)</strong></div>
+                        <hr />
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary me-2" @onclick="@(() => _step = 1)">Back</button>
+                        <button class="btn btn-primary" @onclick="GoToStep3" disabled="@(!_lines.Any())">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (_step == 3 && _draft != null)
+    {
+        <div class="card">
+            <div class="card-header"><h4>Step 3: Payment & Confirmation</h4></div>
+            <div class="card-body row g-3">
+                <div class="col-md-4">
+                    <label>Payment</label>
+                    <InputSelect class="form-select" @bind-Value="_draft.PaymentStatus">
+                        @foreach (var s in Enum.GetValues<PaymentStatus>())
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between"><span>Total</span><strong>@Eur(Total)</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <button class="btn btn-secondary" @onclick="@(() => _step = 2)">Back</button>
+                <button class="btn btn-success" @onclick="ConfirmDispatch"><i class="fas fa-truck"></i> Confirm & Dispatch Rental</button>
+            </div>
+        </div>
+    }
+</div>
