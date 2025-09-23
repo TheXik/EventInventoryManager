@@ -11,7 +11,7 @@ public class Rental
     [Required]
     public string ClientName { get; set; }
 
-    public string ContactInfo { get; set; }
+    public string ContactInfo { get; set; } = string.Empty;
 
     public DateTime RentalDate { get; set; }
     public DateTime ExpectedReturnDate { get; set; }

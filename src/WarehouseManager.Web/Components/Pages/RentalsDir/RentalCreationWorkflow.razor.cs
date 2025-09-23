@@ -39,7 +39,7 @@ public partial class RentalCreationWorkflow
             _draft = await RentalRepository.AddAsync(new Rental
             {
                 ClientName = _model.ClientName,
-                ContactInfo = _model.ContactInfo,
+                ContactInfo = _model.ContactInfo ?? string.Empty,
                 RentalDate = _model.RentalDate,
                 ExpectedReturnDate = _model.ExpectedReturnDate,
                 DiscountPercentage = _model.DiscountPercentage,
@@ -49,7 +49,7 @@ public partial class RentalCreationWorkflow
         else
         {
             _draft.ClientName = _model.ClientName;
-            _draft.ContactInfo = _model.ContactInfo;
+            _draft.ContactInfo = _model.ContactInfo ?? string.Empty;
             _draft.RentalDate = _model.RentalDate;
             _draft.ExpectedReturnDate = _model.ExpectedReturnDate;
             _draft.DiscountPercentage = _model.DiscountPercentage;
