@@ -1,0 +1,83 @@
+using Microsoft.EntityFrameworkCore;
+using WarehouseManager.Application.Interfaces;
+using WarehouseManager.Core.Entities.Rentals;
+using WarehouseManager.Infrastructure.Data;
+using WarehouseManager.Core.Enums;
+
+namespace WarehouseManager.Infrastructure.Repositories;
+
+public class RentalRepository : IRentalRepository
+{
+    private readonly ApplicationDbContext _context;
+
+    public RentalRepository(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<IEnumerable<Rental>> GetAllAsync()
+    {
+        return await _context.Rentals
+            .Include(r => r.RentalItems)
+            .ThenInclude(ri => ri.InventoryItem)
+            .ToListAsync();
+    }
+
+    public async Task<Rental?> GetByIdAsync(int id)
+    {
+        return await _context.Rentals
+            .Include(r => r.RentalItems)
+            .ThenInclude(ri => ri.InventoryItem)
+            .FirstOrDefaultAsync(r => r.RentalId == id);
+    }
+
+    public async Task<Rental> AddAsync(Rental rental)
+    {
+        _context.Rentals.Add(rental);
+        await _context.SaveChangesAsync();
+        return rental;
+    }
+
+    public async Task UpdateAsync(Rental rental)
+    {
+        _context.Entry(rental).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        // Load rental with items and their inventory items to restore stock
+        var rental = await _context.Rentals
+            .Include(r => r.RentalItems)
+            .ThenInclude(ri => ri.InventoryItem)
+            .FirstOrDefaultAsync(r => r.RentalId == id);
+
+        if (rental == null) return;
+
+        // Return stock: add back unreturned quantities
+        foreach (var ri in rental.RentalItems)
+        {
+            var toReturn = Math.Max(0, ri.QuantityRented - ri.QuantityReturned);
+            if (toReturn > 0)
+            {
+                // Fetch inventory item (attached or reload if null)
+                var inv = ri.InventoryItem ?? await _context.InventoryItems.FirstOrDefaultAsync(i => i.Id == ri.InventoryItemId);
+                if (inv != null)
+                {
+                    inv.AvailableQuantity += toReturn;
+                    // Update availability and rental status
+                    inv.UpdateAvailabilityStatus();
+                    inv.RentalStatus = (inv.AvailableQuantity < inv.TotalQuantity)
+                        ? RentalStatus.Rented
+                        : RentalStatus.Available;
+                }
+            }
+        }
+
+        await _context.SaveChangesAsync();
+
+        // Now remove the rental
+        _context.Rentals.Remove(rental);
+        await _context.SaveChangesAsync();
+    }
+}
