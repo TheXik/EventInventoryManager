@@ -36,6 +36,9 @@ internal class InventoryItemViewModel
     [Range(0, int.MaxValue, ErrorMessage = "Dimensions must be non-negative.")]
     public int Width { get; set; }
 
+    [Range(0, int.MaxValue, ErrorMessage = "Dimensions must be non-negative.")]
+    public int Depth { get; set; }
+
     public TruckLoadingPriority? TruckLoadingPriority { get; set; }
     public RentalStatus RentalStatus { get; set; } = RentalStatus.NotInRentalUse;
     public DateTime? RentalDate { get; set; }
@@ -150,6 +153,7 @@ public partial class Inventory
                 Weight = _viewModel.Weight,
                 Height = _viewModel.Height,
                 Width = _viewModel.Width,
+                Depth = _viewModel.Depth,
                 TruckLoadingPriority = _viewModel.TruckLoadingPriority,
                 RentalStatus = _viewModel.RentalStatus,
                 RentalDate = _viewModel.RentalDate ?? DateTime.UtcNow,
@@ -189,6 +193,7 @@ public partial class Inventory
             itemToUpdate.Weight = _viewModel.Weight;
             itemToUpdate.Height = _viewModel.Height;
             itemToUpdate.Width = _viewModel.Width;
+            itemToUpdate.Depth = _viewModel.Depth;
             itemToUpdate.TruckLoadingPriority = _viewModel.TruckLoadingPriority;
             itemToUpdate.RentalStatus = _viewModel.RentalStatus;
             itemToUpdate.RentalPricePerDay = _viewModel.RentalPricePerDay;
@@ -290,6 +295,7 @@ public partial class Inventory
             Weight = item.Weight,
             Height = item.Height,
             Width = item.Width,
+            Depth = item.Depth,
             TruckLoadingPriority = item.TruckLoadingPriority,
             RentalStatus = item.RentalStatus,
             RentalPricePerDay = item.RentalPricePerDay,
