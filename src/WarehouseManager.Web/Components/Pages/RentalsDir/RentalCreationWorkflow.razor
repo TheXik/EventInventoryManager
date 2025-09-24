@@ -97,7 +97,7 @@
                                             <InputNumber class="form-control quantity-input me-2"
                                                          @bind-Value="line.Quantity" min="1"
                                                          max="@(line.Item.AvailableQuantity + line.Quantity)"
-                                                         @oninput="@(e => OnQtyChange(line, e))"/>
+                                                         @oninput="@((Microsoft.AspNetCore.Components.ChangeEventArgs e) => OnQtyChange(line, e))"/>
                                             <button class="btn btn-sm btn-outline-danger"
                                                     @onclick="@(() => RemoveLine(line))"><i class="fas fa-trash"></i>
                                             </button>
