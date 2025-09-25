@@ -95,7 +95,7 @@ public partial class WarehouseCopilot
             sb.AppendLine(
                 "- Answer ONLY using the data in the CONTEXT below. If something is not present, say you don't have that information and offer to check or ask a human.");
             sb.AppendLine("- Do NOT invent item names, events, quantities, clients, dates, or locations.");
-            sb.AppendLine("- Keep answers brief and actionable. If a list is long, summarize counts.");
+            sb.AppendLine("- Be clear and structured. Provide helpful detail without inventing facts. If a list is long, summarize counts and highlight the most relevant items.");
             sb.AppendLine();
             sb.AppendLine("CONTEXT BEGIN");
             sb.AppendLine($"Now: {now:yyyy-MM-dd HH:mm}");
