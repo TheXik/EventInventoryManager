@@ -7,6 +7,10 @@ using WarehouseManager.Core;
 
 namespace WarehouseManager.Infrastructure.Services;
 
+
+/// <summary>
+/// This class is used to send emails to users using SendGrid 
+/// </summary>
 public class EmailSender : IEmailSender<ApplicationUser>
 {
     private readonly ILogger<EmailSender> _logger;
@@ -17,21 +21,41 @@ public class EmailSender : IEmailSender<ApplicationUser>
         _options = optionsAccessor.Value;
         _logger = logger;
     }
-
+    
+    /// <summary>
+    /// Sends a confirmation link to the user to confirm their email address when registering
+    /// </summary>
+    /// <param name="user"> Name of the user  </param>
+    /// <param name="email"> Email address of the user </param>
+    /// <param name="confirmationLink"> Confirmation link to confirm the users email address </param>
+    /// <returns></returns>
     public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink)
     {
         var subject = "Confirm your email";
-        var message = $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.";
+        var message = $"Please confirm your account by <a href='{confirmationLink}'>clicking here.  Your trusted warehouse manager by Lukáš Hellesch :)))</a>.";
         return Execute(email, subject, message);
     }
-
+    /// <summary>
+    /// Sends a password reset link to the user to reset their password 
+    /// </summary>
+    /// <param name="user"> Name of the user </param>
+    /// <param name="email"> Email address of the user </param>
+    /// <param name="resetLink"> Reset link to reset the users password </param>
+    /// <returns></returns>
     public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink)
     {
         var subject = "Reset your password";
         var message = $"Please reset your password by <a href='{resetLink}'>clicking here</a>.";
         return Execute(email, subject, message);
     }
-
+    
+    /// <summary>
+    /// Sends a password reset code to the user to reset their password 
+    /// </summary>
+    /// <param name="user"> Name of the user  </param>
+    /// <param name="email">Email address of the user </param>
+    /// <param name="resetCode">Reset code to reset the users password </param>
+    /// <returns></returns>
     public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode)
     {
         var subject = "Reset your password";
@@ -47,7 +71,7 @@ public class EmailSender : IEmailSender<ApplicationUser>
         var client = new SendGridClient(_options.SendGridKey);
         var msg = new SendGridMessage
         {
-            From = new EmailAddress("contact@appnestiq.com", "Warehouse Manager"),
+            From = new EmailAddress("contact@appnestiq.com", "Warehouse Manager by Lukáš Hellesch :)))"),
             Subject = subject,
             HtmlContent = htmlMessage
         };
