@@ -9,13 +9,13 @@ namespace WarehouseManager.Core.Entities.Rentals;
 /// </summary>
 public class RentalItem
 {
-    [Key] 
+    [Key]
     public int RentalItemId { get; set; }
 
     /// <summary>
     /// Foreign key to the parent rental order.
     /// </summary>
-    [ForeignKey(nameof(Rental))] 
+    [ForeignKey(nameof(Rental))]
     public int RentalId { get; set; }
 
     /// <summary>
@@ -26,7 +26,7 @@ public class RentalItem
     /// <summary>
     /// Foreign key to the inventory item being rented
     /// </summary>
-    [ForeignKey(nameof(InventoryItem))] 
+    [ForeignKey(nameof(InventoryItem))]
     public int InventoryItemId { get; set; }
 
     /// <summary>

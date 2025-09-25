@@ -14,7 +14,7 @@ public partial class RentalCreationWorkflow
     private readonly List<RentalRow> _lines = new();
 
     private readonly Rental _model = new()
-        { RentalDate = DateTime.Today, ExpectedReturnDate = DateTime.Today.AddDays(1) };
+    { RentalDate = DateTime.Today, ExpectedReturnDate = DateTime.Today.AddDays(1) };
 
     private List<InventoryItem> _all = new();
     private List<InventoryItem> _available = new();

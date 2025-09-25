@@ -9,17 +9,17 @@ public enum RentalOrderStatus
     /// The order is being prepared and is not finalized
     /// </summary>
     Draft,
-    
+
     /// <summary>
     /// Items have been rented out to the client
     /// </summary>
     Rented,
-    
+
     /// <summary>
     /// All rented items have been returned
     /// </summary>
     Returned,
-    
+
     /// <summary>
     /// The return is past the expected date
     /// </summary>

@@ -8,10 +8,10 @@ namespace WarehouseManager.Core.Entities.Rentals;
 /// </summary>
 public class Rental
 {
-    [Key] 
+    [Key]
     public int RentalId { get; set; }
-    
-    [Required] 
+
+    [Required]
     public string ClientName { get; set; }
 
     /// <summary>
