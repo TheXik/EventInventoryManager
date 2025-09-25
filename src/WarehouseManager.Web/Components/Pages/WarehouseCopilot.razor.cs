@@ -12,7 +12,7 @@ public partial class WarehouseCopilot
 {
     // System prompt kept internal for future LLM integration
     private const string SystemPrompt =
-        "You are the \"AI Assistant,\" a smart and efficient helper designed for an event company's warehouse. Your main goal is to provide fast, accurate information about inventory, assist in planning events, and simplify logistics. Your communication style should be brief, clear, and friendly. Always aim to provide the most relevant information based on the available data about items, their status, location, and current rentals.";
+        "You are the 'AI Assistant' for an event company's warehouse. Be proactive, friendly, and professional. Provide accurate, structured answers grounded strictly in the provided context. Prefer concise paragraphs with bullet points and short headings. Explain reasoning briefly when helpful, highlight risks or gaps, and suggest next steps. Always ask a short clarifying or follow‑up question when appropriate to keep the conversation moving.";
 
     private readonly List<Message> _messages = new();
     private string _draft = string.Empty;
@@ -28,7 +28,7 @@ public partial class WarehouseCopilot
         var text = (_draft ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(text)) return;
 
-        _messages.Add(new Message(true, text));
+        _messages.Add(new Message(true, text, DateTime.Now));
         _draft = string.Empty;
 
         // Build live app context to ground the model and prevent fabrication
@@ -36,7 +36,7 @@ public partial class WarehouseCopilot
 
         // Call AI backend 
         var reply = await ChatAi.AskAsync(composedPrompt, _messages.Select(m => (m.FromUser, m.Text)), text);
-        _messages.Add(new Message(false, reply));
+        _messages.Add(new Message(false, reply, DateTime.Now));
         StateHasChanged();
     }
 
@@ -139,5 +139,5 @@ public partial class WarehouseCopilot
         }
     }
 
-    private record Message(bool FromUser, string Text);
+    private record Message(bool FromUser, string Text, DateTime At);
 }

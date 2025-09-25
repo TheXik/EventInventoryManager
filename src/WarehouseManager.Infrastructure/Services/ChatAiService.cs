@@ -58,7 +58,7 @@ public class ChatAiService : IChatAiService
             contents,
             generationConfig = new
             {
-                temperature = 1,
+                temperature = 0.7,
                 maxOutputTokens = 2000,
                 topK = 20,
                 topP = 0.9

@@ -18,8 +18,15 @@
                     @foreach (var m in _messages)
                     {
                         <div class="chat-row @(m.FromUser ? "user" : "bot")">
+                            <div class="avatar">
+                                <i class="fas @(m.FromUser ? "fa-user" : "fa-robot")"></i>
+                            </div>
                             <div class="bubble">
-                                @m.Text
+                                <div class="meta">
+                                    <span class="name">@(m.FromUser ? "You" : "Assistant")</span>
+                                    <span class="time">@m.At.ToString("HH:mm")</span>
+                                </div>
+                                <div class="text">@m.Text</div>
                             </div>
                         </div>
                     }
