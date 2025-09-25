@@ -33,6 +33,24 @@ else
         </div>
     </div>
 
+    @if (_rental.Status == RentalOrderStatus.Returned && @_rental.PaymentStatus == PaymentStatus.Unpaid)
+    {
+        <div class="alert alert-warning d-flex justify-content-between align-items-center">
+            <div>
+                This rental was returned but payment is still marked as Unpaid. Update the payment status:
+            </div>
+            <div class="d-flex align-items-center">
+                <InputSelect class="form-select me-2" style="min-width: 160px;" @bind-Value="_rental.PaymentStatus">
+                    @foreach (var s in Enum.GetValues<PaymentStatus>())
+                    {
+                        <option value="@s">@s</option>
+                    }
+                </InputSelect>
+                <button class="btn btn-primary" @onclick="SavePaymentStatus"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </div>
+    }
+
     <div class="card">
         <div class="card-header"><h4>Items</h4></div>
         <div class="card-body">

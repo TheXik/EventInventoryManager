@@ -9,6 +9,8 @@ namespace WarehouseManager.Web.Components.Pages.RentalsDir;
 
 public partial class RentalCreationWorkflow
 {
+    [Parameter] public int? RentalId { get; set; }
+
     private readonly List<RentalRow> _lines = new();
 
     private readonly Rental _model = new()
@@ -34,7 +36,55 @@ public partial class RentalCreationWorkflow
     protected override async Task OnInitializedAsync()
     {
         _all = (await InventoryRepository.GetAllAsync()).ToList();
+
+        if (RentalId.HasValue)
+        {
+            await LoadDraftAsync(RentalId.Value);
+        }
+
         Filter();
+    }
+
+    private async Task LoadDraftAsync(int id)
+    {
+        var existing = await RentalRepository.GetByIdAsync(id);
+        if (existing == null)
+        {
+            return;
+        }
+
+        // Only allow editing drafts here; if already rented, redirect to details
+        if (existing.Status != RentalOrderStatus.Draft)
+        {
+            Nav.NavigateTo($"/rentals/{existing.RentalId}");
+            return;
+        }
+
+        _draft = existing;
+        _model.ClientName = existing.ClientName;
+        _model.ContactInfo = existing.ContactInfo;
+        _model.RentalDate = existing.RentalDate;
+        _model.ExpectedReturnDate = existing.ExpectedReturnDate;
+        _model.DiscountPercentage = existing.DiscountPercentage;
+
+        var rentalItems = (await RentalItemRepository.GetByRentalIdAsync(existing.RentalId)).ToList();
+        _draft.RentalItems = rentalItems;
+
+        _lines.Clear();
+        foreach (var ri in rentalItems)
+        {
+            var inv = await InventoryRepository.GetByIdAsync(ri.InventoryItemId);
+            if (inv == null) continue;
+
+            _lines.Add(new RentalRow
+            {
+                Item = inv,
+                Quantity = ri.QuantityRented,
+                PricePerDay = ri.PricePerDayAtTimeOfRental
+            });
+        }
+
+        _step = 2;
     }
 
     private async Task GoToStep2()
@@ -59,6 +109,12 @@ public partial class RentalCreationWorkflow
             _draft.ExpectedReturnDate = _model.ExpectedReturnDate;
             _draft.DiscountPercentage = _model.DiscountPercentage;
             await RentalRepository.UpdateAsync(_draft);
+        }
+
+        // Ensure the URL contains the draft ID so the user can resume later if they close after Step 1
+        if (_draft != null)
+        {
+            Nav.NavigateTo($"/rentals/new/{_draft.RentalId}", true);
         }
 
         _step = 2;
@@ -116,11 +172,8 @@ public partial class RentalCreationWorkflow
         }
 
         // Ensure rental status reflects that items are in use
-        if (_draft != null && _draft.Status != RentalOrderStatus.Rented && _lines.Any(l => l.Quantity > 0))
-        {
-            _draft.Status = RentalOrderStatus.Rented;
-            await RentalRepository.UpdateAsync(_draft);
-        }
+        // Keep rental as Draft until final confirmation to allow resuming later
+        // Do not auto-switch to Rented here
 
         Filter();
         StateHasChanged();
