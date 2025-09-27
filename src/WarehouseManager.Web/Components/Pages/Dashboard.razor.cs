@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using WarehouseManager.Core.Entities;
 using WarehouseManager.Core.Entities.InventoryPage;
 using WarehouseManager.Core.Enums;
@@ -7,7 +6,7 @@ using WarehouseManager.Core.Enums;
 namespace WarehouseManager.Web.Components.Pages;
 
 /// <summary>
-/// Backing class for the Dashboard page. Loads inventory and event data and exposes
+/// Loads inventory and event data and exposes
 /// simple computed values for the UI (Stat cards, active events, and upcoming events).
 /// </summary>
 public partial class Dashboard
@@ -31,10 +30,9 @@ public partial class Dashboard
     [Inject] private ILogger<Dashboard> Logger { get; set; } = default!;
 
     /// <summary>
-    /// Loads inventory items and events concurrently, computes KPI values, and prepares
-    /// active and upcoming event collections for rendering.
+    /// Loads inventory items and events 
     /// </summary>
-    /// <returns>A task that completes when initialization is done.</returns>
+    /// <returns>A task that completes when initialization is done</returns>
     protected override async Task OnInitializedAsync()
     {
         try
@@ -57,7 +55,7 @@ public partial class Dashboard
     }
     
     /// <summary>
-    /// Loads and processes dashboard data concurrently.
+    /// Loads and processes dashboard data concurrently
     /// </summary>
     private async Task LoadDashboardDataAsync()
     {
@@ -73,7 +71,7 @@ public partial class Dashboard
     }
     
     /// <summary>
-    /// Computes dashboard statistics from inventory data.
+    /// Computes dashboard statistics from inventory data
     /// </summary>
     private void ComputeStatistics()
     {
@@ -87,7 +85,7 @@ public partial class Dashboard
     }
     
     /// <summary>
-    /// Processes events to separate active and upcoming events.
+    /// Processes events to separate active and upcoming events
     /// </summary>
     private void ProcessEvents(List<Event> allEvents)
     {
@@ -106,11 +104,11 @@ public partial class Dashboard
     }
 
     /// <summary>
-    /// Returns the Bootstrap-like badge CSS class string for the given due date.
+    /// Returns badge CSS class string for the given due date
     /// </summary>
     /// <param name="dueDate">The event's end date (used as the rental due date).</param>
     /// <returns>
-    /// <c>"bg-danger"</c> when the due date is in the past (overdue), otherwise <c>"bg-success"</c>.
+    /// <c>"bg-danger"</c> when the event is overdue, otherwise <c>"bg-success"</c>.
     /// </returns>
     private static string GetRentalStatusBadge(DateTime dueDate)
     {
@@ -121,14 +119,14 @@ public partial class Dashboard
     /// Returns the human-readable status text for the given due date.
     /// </summary>
     /// <param name="dueDate">The event's end date (used as the rental due date).</param>
-    /// <returns><c>"Overdue"</c> if the date is past today; otherwise <c>"Active"</c>.</returns>
+    /// <returns> Overdue if the date is past today otherwise Active</returns>
     private static string GetRentalStatusText(DateTime dueDate)
     {
         return dueDate < DateTime.Now.Date ? "Overdue" : "Active";
     }
     
     /// <summary>
-    /// Refreshes the dashboard data.
+    /// Refreshes the dashboard data
     /// </summary>
     public async Task RefreshDataAsync()
     {
@@ -137,7 +135,7 @@ public partial class Dashboard
 }
 
 /// <summary>
-/// View model containing dashboard statistics.
+/// View model containing dashboard statistics
 /// </summary>
 public class DashboardStatistics
 {
