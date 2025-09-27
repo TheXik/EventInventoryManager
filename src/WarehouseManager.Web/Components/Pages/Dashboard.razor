@@ -10,6 +10,7 @@ Sections
 -Upcoming Events
 -AI Assistant 
 *@
+
 @page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
 @using WarehouseManager.Application.Interfaces
@@ -26,6 +27,27 @@ Sections
     </div>
 </div>
 
+@if (_isLoading)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading dashboard data...</p>
+    </div>
+}
+else if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @_errorMessage
+        <button class="btn btn-sm btn-outline-danger ms-2" @onclick="RefreshDataAsync">
+            <i class="fas fa-refresh me-1"></i>Retry
+        </button>
+    </div>
+}
+else
+{
 <div class="row">
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="stat-card card-total-items h-100">
@@ -33,7 +55,7 @@ Sections
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-uppercase mb-1">Total Items</div>
-                        <div class="h5 mb-0 font-weight-bold">@_totalItems</div>
+                        <div class="h5 mb-0 font-weight-bold">@_statistics.TotalItems</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-boxes-stacked fa-2x"></i>
@@ -48,7 +70,7 @@ Sections
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-uppercase mb-1">Available</div>
-                        <div class="h5 mb-0 font-weight-bold">@_availableItemsCount</div>
+                        <div class="h5 mb-0 font-weight-bold">@_statistics.AvailableItemsCount</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-check-circle fa-2x"></i>
@@ -63,7 +85,7 @@ Sections
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-uppercase mb-1">Rented Out</div>
-                        <div class="h5 mb-0 font-weight-bold">@_rentedItemsCount</div>
+                        <div class="h5 mb-0 font-weight-bold">@_statistics.RentedItemsCount</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-truck-loading fa-2x"></i>
@@ -78,7 +100,7 @@ Sections
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-uppercase mb-1">Damaged</div>
-                        <div class="h5 mb-0 font-weight-bold">@_damagedItemsCount</div>
+                        <div class="h5 mb-0 font-weight-bold">@_statistics.DamagedItemsCount</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-exclamation-triangle fa-2x"></i>
@@ -167,4 +189,4 @@ Sections
         </div>
     </div>
 </div>
-
+}

@@ -1,4 +1,5 @@
-
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using WarehouseManager.Core.Entities;
 using WarehouseManager.Core.Entities.InventoryPage;
 using WarehouseManager.Core.Enums;
@@ -11,40 +12,23 @@ namespace WarehouseManager.Web.Components.Pages;
 /// </summary>
 public partial class Dashboard
 {
-    /// <summary>
-    /// Currently active events (StartDate ≤ now ≤ EndDate) THey ordered by the soonest ending first.
-    /// </summary>
+    // Constants
+    private const int MaxUpcomingEventsDisplay = 5;
+    
+    // State
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    
+    // Data collections
     private List<Event> _activeEvents = new();
-
-    /// <summary>
-    /// All inventory items loaded from the repository.
-    /// </summary>
     private List<InventoryItem> _allItems = new();
-
-    /// <summary>
-    /// Count of items that are currently available.
-    /// </summary>
-    private int _availableItemsCount;
-
-    /// <summary>
-    /// Count of items marked with <see cref="Condition.Damaged"/>.
-    /// </summary>
-    private int _damagedItemsCount;
-
-    /// <summary>
-    /// Count of items that have at least one unit rented out.
-    /// </summary>
-    private int _rentedItemsCount;
-
-    /// <summary>
-    /// Total number of inventory items.
-    /// </summary>
-    private int _totalItems;
-
-    /// <summary>
-    /// Upcoming events (StartDate &gt; now), ordered by start date and limited to 5.
-    /// </summary>
     private List<Event> _upcomingEvents = new();
+    
+    // Computed statistics
+    private DashboardStatistics _statistics = new();
+    
+    // Dependencies
+    [Inject] private ILogger<Dashboard> Logger { get; set; } = default!;
 
     /// <summary>
     /// Loads inventory items and events concurrently, computes KPI values, and prepares
@@ -53,6 +37,30 @@ public partial class Dashboard
     /// <returns>A task that completes when initialization is done.</returns>
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            _isLoading = true;
+            _errorMessage = null;
+            
+            await LoadDashboardDataAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load dashboard data");
+            _errorMessage = "Failed to load dashboard data. Please refresh the page.";
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+    /// <summary>
+    /// Loads and processes dashboard data concurrently.
+    /// </summary>
+    private async Task LoadDashboardDataAsync()
+    {
         var itemsTask = InventoryRepo.GetAllAsync();
         var eventsTask = EventRepo.GetAllAsync();
         await Task.WhenAll(itemsTask, eventsTask);
@@ -60,12 +68,31 @@ public partial class Dashboard
         _allItems = (await itemsTask).ToList();
         var allEvents = (await eventsTask).ToList();
 
-        _totalItems = _allItems.Count;
-        _rentedItemsCount = _allItems.Count(i => i.AvailableQuantity < i.TotalQuantity);
-        _damagedItemsCount = _allItems.Count(i => i.Condition == Condition.Damaged);
-        _availableItemsCount = _allItems.Count(i => i.AvailabilityStatus == AvailabilityStatus.Available);
-
+        ComputeStatistics();
+        ProcessEvents(allEvents);
+    }
+    
+    /// <summary>
+    /// Computes dashboard statistics from inventory data.
+    /// </summary>
+    private void ComputeStatistics()
+    {
+        _statistics = new DashboardStatistics
+        {
+            TotalItems = _allItems.Count,
+            AvailableItemsCount = _allItems.Count(i => i.AvailabilityStatus == AvailabilityStatus.Available),
+            RentedItemsCount = _allItems.Count(i => i.AvailableQuantity < i.TotalQuantity),
+            DamagedItemsCount = _allItems.Count(i => i.Condition == Condition.Damaged)
+        };
+    }
+    
+    /// <summary>
+    /// Processes events to separate active and upcoming events.
+    /// </summary>
+    private void ProcessEvents(List<Event> allEvents)
+    {
         var now = DateTime.Now;
+        
         _activeEvents = allEvents
             .Where(e => e.StartDate <= now && e.EndDate >= now)
             .OrderBy(e => e.EndDate)
@@ -74,7 +101,7 @@ public partial class Dashboard
         _upcomingEvents = allEvents
             .Where(e => e.StartDate > now)
             .OrderBy(e => e.StartDate)
-            .Take(5)
+            .Take(MaxUpcomingEventsDisplay)
             .ToList();
     }
 
@@ -85,7 +112,7 @@ public partial class Dashboard
     /// <returns>
     /// <c>"bg-danger"</c> when the due date is in the past (overdue), otherwise <c>"bg-success"</c>.
     /// </returns>
-    private string GetRentalStatusBadge(DateTime dueDate)
+    private static string GetRentalStatusBadge(DateTime dueDate)
     {
         return dueDate < DateTime.Now.Date ? "bg-danger" : "bg-success";
     }
@@ -95,8 +122,27 @@ public partial class Dashboard
     /// </summary>
     /// <param name="dueDate">The event's end date (used as the rental due date).</param>
     /// <returns><c>"Overdue"</c> if the date is past today; otherwise <c>"Active"</c>.</returns>
-    private string GetRentalStatusText(DateTime dueDate)
+    private static string GetRentalStatusText(DateTime dueDate)
     {
         return dueDate < DateTime.Now.Date ? "Overdue" : "Active";
     }
+    
+    /// <summary>
+    /// Refreshes the dashboard data.
+    /// </summary>
+    public async Task RefreshDataAsync()
+    {
+        await OnInitializedAsync();
+    }
+}
+
+/// <summary>
+/// View model containing dashboard statistics.
+/// </summary>
+public class DashboardStatistics
+{
+    public int TotalItems { get; set; }
+    public int AvailableItemsCount { get; set; }
+    public int RentedItemsCount { get; set; }
+    public int DamagedItemsCount { get; set; }
 }
