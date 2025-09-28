@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 using WarehouseManager.Application.Interfaces;
 using WarehouseManager.Core.Entities;
 
@@ -22,6 +23,7 @@ public partial class Events
     // Dependency Injection
     [Inject] private IEventRepository EventRepository { get; set; } = default!;
     [Inject] private ILogger<Events> Logger { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
 
     /// <summary>
     /// Initializes the component by loading all events from the database
@@ -82,6 +84,11 @@ public partial class Events
     {
         try
         {
+            // Show confirmation dialog
+            var confirmed = await JS.InvokeAsync<bool>("confirm", 
+                $"Are you sure you want to delete the event '{eventToDelete.Name}'? This will return all allocated items to inventory and cannot be undone.");
+            if (!confirmed) return;
+
             _isLoading = true;
             _errorMessage = null;
             

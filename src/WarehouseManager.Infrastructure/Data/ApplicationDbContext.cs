@@ -65,7 +65,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<EventInventoryItem>()
             .HasOne(ei => ei.Event)
             .WithMany(e => e.EventInventoryItems)
-            .HasForeignKey(ei => ei.EventId);
+            .HasForeignKey(ei => ei.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Defines the one-to-many relationship between InventoryItem and EventInventoryItem
         builder.Entity<EventInventoryItem>()

@@ -59,16 +59,33 @@ public class EventRepository : IEventRepository
         await _context.SaveChangesAsync();
     }
     /// <summary>
-    /// deletes an event from the database by its ID
+    /// deletes an event from the database by its ID and returns allocated items to inventory
     /// </summary>
     /// <param name="id"> Id of the event to delete </param>
     public async Task DeleteAsync(int id)
     {
-        var eventToDelete = await _context.Events.FindAsync(id);
-        if (eventToDelete != null)
+        // Load event with its allocated items and their inventory items
+        var eventToDelete = await _context.Events
+            .Include(e => e.EventInventoryItems)
+            .ThenInclude(ei => ei.InventoryItem)
+            .FirstOrDefaultAsync(e => e.Id == id);
+            
+        if (eventToDelete == null) return;
+
+        // Return allocated items to inventory
+        foreach (var eventItem in eventToDelete.EventInventoryItems)
         {
-            _context.Events.Remove(eventToDelete);
-            await _context.SaveChangesAsync();
+            var inventoryItem = eventItem.InventoryItem;
+            if (inventoryItem != null)
+            {
+                inventoryItem.AvailableQuantity += eventItem.Quantity;
+                inventoryItem.UpdateAvailabilityStatus();
+            }
         }
+
+        await _context.SaveChangesAsync();
+
+        _context.Events.Remove(eventToDelete);
+        await _context.SaveChangesAsync();
     }
 }
