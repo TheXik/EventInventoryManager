@@ -63,9 +63,9 @@ public class InventoryItem
     public int Width { get; set; }
 
     /// <summary>
-    /// Depth dimension of a single unit
+    /// Length dimension of a single unit
     /// </summary>
-    public int Depth { get; set; }
+    public int Length { get; set; }
 
     /// <summary>
     /// Loading priority suggestion to optimize truck loading
