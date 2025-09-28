@@ -7,6 +7,18 @@
                 <button type="button" class="btn-close" @onclick="Close"></button>
             </div>
             <div class="modal-body">
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> @_errorMessage
+                    </div>
+                }
+
+                @if (_isLoading)
+                {
+                    <div class="loading-spinner"></div>
+                }
+
                 <EditForm Model="@_eventModel" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator/>
                     <ValidationSummary/>

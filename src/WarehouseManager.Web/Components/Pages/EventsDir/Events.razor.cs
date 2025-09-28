@@ -1,81 +1,158 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using WarehouseManager.Application.Interfaces;
 using WarehouseManager.Core.Entities;
 
 namespace WarehouseManager.Web.Components.Pages.EventsDir;
 
+/// <summary>
+/// Main events management page component
+/// Provides both calendar and list views for event management with CRUD operations
+/// </summary>
 public partial class Events
 {
-    // This is the component reference for your modal form
-    private EventForm _eventForm = default!;
+    // Component References (event form)
+    private EventForm _eventForm = default!; 
 
-    // This list holds all the event data
-    private List<Event> _events = new();
+    private List<Event> _events = new(); // List of events
+    private bool isCalendarView; // Calendar view flag
+    private string? _errorMessage;
+    private bool _isLoading = true;
 
-    // This boolean controls the view toggle
-    private bool isCalendarView;
-
+    // Dependency Injection
     [Inject] private IEventRepository EventRepository { get; set; } = default!;
-
     [Inject] private ILogger<Events> Logger { get; set; } = default!;
 
+    /// <summary>
+    /// Initializes the component by loading all events from the database
+    /// </summary>
     protected override async Task OnInitializedAsync()
     {
         await LoadEvents();
     }
 
+    /// <summary>
+    /// Loads all events from the database and updates the UI state.
+    /// </summary>
     private async Task LoadEvents()
     {
         try
         {
+            _isLoading = true;
+            _errorMessage = null;
+            
             var eventsData = await EventRepository.GetAllAsync();
-            _events = eventsData.ToList();
+            _events = eventsData.OrderByDescending(e => e.StartDate).ToList();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading events.");
-            //TODO ADD BETTER NOTIFICATION
+            _errorMessage = $"Failed to load events: {ex.Message}";
+            Logger.LogError(ex, "Error loading events");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
         }
     }
 
+    /// <summary>
+    /// Opens the event form for creating a new event
+    /// </summary>
+    /// <param name="startDate">The suggested start date for the new event</param>
     private void AddNewEvent(DateTime startDate)
     {
-        var newEvent = new Event
-        {
-            StartDate = startDate,
-            EndDate = startDate.AddHours(1),
-            Color = "#3788d8"
-        };
         _eventForm.Create();
     }
 
+    /// <summary>
+    /// Opens the event form for editing an existing event
+    /// </summary>
+    /// <param name="eventToEdit">The event to edit</param>
     private void EditEvent(Event eventToEdit)
     {
         _eventForm.Edit(eventToEdit);
     }
 
+    /// <summary>
+    /// Deletes an event after user confirmation
+    /// </summary>
+    /// <param name="eventToDelete">The event to delete</param>
     private async Task DeleteEvent(Event eventToDelete)
     {
-        // TODO add a confirmation dialog here before deleting
-        await EventRepository.DeleteAsync(eventToDelete.Id);
-        await LoadEvents();
-        StateHasChanged();
+        try
+        {
+            _isLoading = true;
+            _errorMessage = null;
+            
+            await EventRepository.DeleteAsync(eventToDelete.Id);
+            await LoadEvents();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to delete event: {ex.Message}";
+            Logger.LogError(ex, "Error deleting event {EventId}", eventToDelete.Id);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
 
+    /// <summary>
+    /// Handles saving events (both new and existing)
+    /// </summary>
+    /// <param name="savedEvent">The event to save</param>
     private async Task HandleSaveEvent(Event savedEvent)
     {
-        if (savedEvent.Id == 0)
-            await EventRepository.AddAsync(savedEvent);
-        else
-            await EventRepository.UpdateAsync(savedEvent);
-        await LoadEvents();
-        StateHasChanged();
+        try
+        {
+            _isLoading = true;
+            _errorMessage = null;
+            
+            if (savedEvent.Id == 0)
+                await EventRepository.AddAsync(savedEvent);
+            else
+                await EventRepository.UpdateAsync(savedEvent);
+                
+            await LoadEvents();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to save event: {ex.Message}";
+            Logger.LogError(ex, "Error saving event {EventId}", savedEvent.Id);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
 
+    /// <summary>
+    /// Handles event updates from the calendar view (drag & drop)
+    /// </summary>
+    /// <param name="updatedEvent">The updated event</param>
     private async Task HandleEventUpdate(Event updatedEvent)
     {
-        await EventRepository.UpdateAsync(updatedEvent);
-        await LoadEvents();
-        StateHasChanged();
+        try
+        {
+            _isLoading = true;
+            _errorMessage = null;
+            
+            await EventRepository.UpdateAsync(updatedEvent);
+            await LoadEvents();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to update event: {ex.Message}";
+            Logger.LogError(ex, "Error updating event {EventId}", updatedEvent.Id);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
 }

@@ -1,9 +1,20 @@
 @page "/rentals/{RentalId:int}"
 @using WarehouseManager.Core.Enums
 
-@if (_rental == null)
+@if (_isLoading)
 {
     <div class="loading-spinner"></div>
+}
+else if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle"></i> @_errorMessage
+    </div>
+}
+else if (_rental == null)
+{
+    <div class="empty-state"><i class="fas fa-exclamation-circle"></i>
+        <p>Rental not found.</p></div>
 }
 else
 {

@@ -18,6 +18,18 @@
         </div>
     </div>
 
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> @_errorMessage
+        </div>
+    }
+
+    @if (_isLoading)
+    {
+        <div class="loading-spinner"></div>
+    }
+
     @if (isCalendarView)
     {
         <EventCalendarView Events="_events" OnEventClick="EditEvent" OnDateSelect="AddNewEvent"
