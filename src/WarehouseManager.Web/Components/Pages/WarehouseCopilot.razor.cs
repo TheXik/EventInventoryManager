@@ -100,7 +100,9 @@ public partial class WarehouseCopilot
                     }
                 }
             }
-
+            sb.AppendLine();
+            sb.AppendLine("IMPORTANT: Do not use any markdown formatting. Do not use asterisks for bolding or bullet points. Use plain text only. Explain reasoning briefly when helpful, highlight risks or gaps, and suggest next steps. Always ask a short clarifying or follow‑up question when appropriate to keep the conversation moving.");
+            
             return sb.ToString();
         }
         catch
