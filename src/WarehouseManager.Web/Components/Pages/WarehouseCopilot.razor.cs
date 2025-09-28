@@ -10,9 +10,7 @@ namespace WarehouseManager.Web.Components.Pages;
 
 public partial class WarehouseCopilot
 {
-    // System prompt kept internal for future LLM integration
-    private const string SystemPrompt =
-        "You are the 'AI Assistant' for an event company's warehouse. Be proactive, friendly, and professional. Provide accurate, structured answers grounded strictly in the provided context. IMPORTANT: Do not use any markdown formatting. Do not use asterisks for bolding or bullet points. Use plain text only. Explain reasoning briefly when helpful, highlight risks or gaps, and suggest next steps. Always ask a short clarifying or follow‑up question when appropriate to keep the conversation moving.";
+    private const string SystemPrompt = "You are an AI assistant for a warehouse. Answer questions about inventory, events, and rentals using only the data provided. Use plain text only.";
     private readonly List<Message> _messages = new();
     private string _draft = string.Empty;
 
@@ -24,17 +22,14 @@ public partial class WarehouseCopilot
 
     private async Task Send()
     {
-        var text = (_draft ?? string.Empty).Trim();
+        var text = _draft.Trim();
         if (string.IsNullOrWhiteSpace(text)) return;
 
         _messages.Add(new Message(true, text, DateTime.Now));
         _draft = string.Empty;
 
-        // Build live app context to ground the model and prevent fabrication
-        var composedPrompt = await BuildContextualSystemPromptAsync();
-
-        // Call AI backend 
-        var reply = await ChatAi.AskAsync(composedPrompt, _messages.Select(m => (m.FromUser, m.Text)), text);
+        var context = await BuildContextAsync();
+        var reply = await ChatAi.AskAsync(context, _messages.Select(m => (m.FromUser, m.Text)), text);
         _messages.Add(new Message(false, reply, DateTime.Now));
         StateHasChanged();
     }
@@ -44,97 +39,73 @@ public partial class WarehouseCopilot
         if (e.Key == "Enter") await Send();
     }
 
-    private async Task<string> BuildContextualSystemPromptAsync()
+    private async Task<string> BuildContextAsync()
     {
         try
         {
             var items = (await InventoryRepo.GetAllAsync()).ToList();
-            var eventsList = (await EventRepo.GetAllAsync()).ToList();
+            var events = (await EventRepo.GetAllAsync()).ToList();
             var rentals = (await RentalRepo.GetAllAsync()).ToList();
-
-            var now = DateTime.Now;
-            var overdue = rentals
-                .Where(r => r.Status != RentalOrderStatus.Returned && r.ExpectedReturnDate.Date < now.Date)
-                .OrderBy(r => r.ExpectedReturnDate)
-                .ToList();
-
-            // Inventory: include all items with full status
-            var itemLines = items
-                .OrderBy(i => i.Name)
-                .Select(i =>
-                    $"- {i.Id} | {i.Name} | Avail: {i.AvailableQuantity}/{i.TotalQuantity} | Availability: {i.AvailabilityStatus} | RentalStatus: {i.RentalStatus} | Condition: {i.Condition} |  {(string.IsNullOrWhiteSpace(i.ConditionDescription) ? string.Empty : $"({i.ConditionDescription})")}");
-
-            // Events: include items per event
-            var eventBlocks = eventsList
-                .OrderBy(e => e.StartDate)
-                .Select(e => new
-                {
-                    Header =
-                        $"- EVENT #{e.Id}: {e.Name} | {e.StartDate:yyyy-MM-dd} → {e.EndDate:yyyy-MM-dd} | Items: {e.EventInventoryItems?.Count ?? 0}",
-                    Lines = (e.EventInventoryItems ?? new List<EventInventoryItem>())
-                        .Select(ei => $"    • ItemId:{ei.InventoryItemId} Qty:{ei.Quantity}")
-                });
-
-            // Rentals: include items per rental
-            var rentalBlocks = rentals
-                .OrderBy(r => r.ExpectedReturnDate)
-                .Select(r => new
-                {
-                    Header =
-                        $"- RENTAL #{r.RentalId}: {r.ClientName} | Status:{r.Status} | Payment:{r.PaymentStatus} | Dates: {r.RentalDate:yyyy-MM-dd} → {r.ExpectedReturnDate:yyyy-MM-dd}{(r.ActualReturnDate.HasValue ? $" (Returned:{r.ActualReturnDate.Value:yyyy-MM-dd})" : string.Empty)}",
-                    Lines = (r.RentalItems ?? new List<RentalItem>())
-                        .Select(ri =>
-                            $"    • ItemId:{ri.InventoryItemId} QtyRented:{ri.QuantityRented} QtyReturned:{ri.QuantityReturned} Price/Day:{ri.PricePerDayAtTimeOfRental}")
-                });
 
             var sb = new StringBuilder();
             sb.AppendLine(SystemPrompt);
             sb.AppendLine();
-            sb.AppendLine("CRITICAL RULES:");
-            sb.AppendLine(
-                "- Answer ONLY using the data in the CONTEXT below. If something is not present, say you don't have that information and offer to check or ask a human.");
-            sb.AppendLine("- Do NOT invent item names, events, quantities, clients, dates, or locations.");
-            sb.AppendLine("- Be clear and structured. Provide helpful detail without inventing facts. If a list is long, summarize counts and highlight the most relevant items.");
-            sb.AppendLine();
-            sb.AppendLine("CONTEXT BEGIN");
-            sb.AppendLine($"Now: {now:yyyy-MM-dd HH:mm}");
-            sb.AppendLine();
-            sb.AppendLine("Inventory (ALL ITEMS):");
-            foreach (var line in itemLines) sb.AppendLine(line);
-            sb.AppendLine();
-            sb.AppendLine("Events (ALL, WITH ITEMS):");
-            foreach (var block in eventBlocks)
+            sb.AppendLine("INVENTORY:");
+            foreach (var item in items)
             {
-                sb.AppendLine(block.Header);
-                foreach (var ln in block.Lines) sb.AppendLine(ln);
+                sb.AppendLine($"- {item.Name} (ID:{item.Id}) | Available: {item.AvailableQuantity}/{item.TotalQuantity} | Category: {item.Category?.Name} | Condition: {item.Condition} | Weight: {item.Weight}kg | Dimensions: {item.Height}x{item.Width}x{item.Length}cm | Rental Price: ${item.RentalPricePerDay}/day | Loading Priority: {item.TruckLoadingPriority} | Rental Status: {item.RentalStatus}");
+                if (!string.IsNullOrWhiteSpace(item.Description))
+                    sb.AppendLine($"  Description: {item.Description}");
+                if (!string.IsNullOrWhiteSpace(item.ConditionDescription))
+                    sb.AppendLine($"  Condition Notes: {item.ConditionDescription}");
+                if (!string.IsNullOrWhiteSpace(item.RentalDescription))
+                    sb.AppendLine($"  Rental Notes: {item.RentalDescription}");
             }
 
             sb.AppendLine();
-            sb.AppendLine("Rentals (ALL, WITH ITEMS):");
-            foreach (var block in rentalBlocks)
+            sb.AppendLine("EVENTS:");
+            foreach (var evt in events)
             {
-                sb.AppendLine(block.Header);
-                foreach (var ln in block.Lines) sb.AppendLine(ln);
+                sb.AppendLine($"- {evt.Name} (ID:{evt.Id}) | {evt.StartDate:yyyy-MM-dd} to {evt.EndDate:yyyy-MM-dd} | Client: {evt.ClientName} | Location: {evt.Location} | Contact: {evt.ClientContact} | Color: {evt.Color}");
+                if (!string.IsNullOrWhiteSpace(evt.Description))
+                    sb.AppendLine($"  Description: {evt.Description}");
+                sb.AppendLine($"  Items ({evt.EventInventoryItems?.Count ?? 0}):");
+                if (evt.EventInventoryItems != null)
+                {
+                    foreach (var eventItem in evt.EventInventoryItems)
+                    {
+                        var item = items.FirstOrDefault(i => i.Id == eventItem.InventoryItemId);
+                        sb.AppendLine($"    - {item?.Name ?? "Unknown"} (ID:{eventItem.InventoryItemId}) | Qty: {eventItem.Quantity}");
+                    }
+                }
             }
 
             sb.AppendLine();
-            sb.AppendLine("Overdue Rentals:");
-            if (overdue.Any())
-                foreach (var r in overdue)
-                    sb.AppendLine($"- RENTAL #{r.RentalId} | {r.ClientName} | Due: {r.ExpectedReturnDate:yyyy-MM-dd}");
-            else sb.AppendLine("- None");
-            sb.AppendLine("CONTEXT END");
-
-            sb.AppendLine();
-            sb.AppendLine(
-                "If the user asks to 'prep gear' for an event, verify each requested item exists and has sufficient AvailableQuantity; if not, report the shortfall. Do not assign times/locations that are not in the context.");
+            sb.AppendLine("RENTALS:");
+            foreach (var rental in rentals)
+            {
+                sb.AppendLine($"- {rental.ClientName} (ID:{rental.RentalId}) | {rental.RentalDate:yyyy-MM-dd} to {rental.ExpectedReturnDate:yyyy-MM-dd} | Status: {rental.Status} | Payment: {rental.PaymentStatus} | Contact: {rental.ContactInfo} | Discount: {rental.DiscountPercentage}%");
+                if (rental.ActualReturnDate.HasValue)
+                    sb.AppendLine($"  Returned: {rental.ActualReturnDate.Value:yyyy-MM-dd}");
+                if (!string.IsNullOrWhiteSpace(rental.Notes))
+                    sb.AppendLine($"  Notes: {rental.Notes}");
+                sb.AppendLine($"  Items ({rental.RentalItems?.Count ?? 0}):");
+                if (rental.RentalItems != null)
+                {
+                    foreach (var rentalItem in rental.RentalItems)
+                    {
+                        var item = items.FirstOrDefault(i => i.Id == rentalItem.InventoryItemId);
+                        var stillOut = rentalItem.QuantityRented - rentalItem.QuantityReturned;
+                        sb.AppendLine($"    - {item?.Name ?? "Unknown"} (ID:{rentalItem.InventoryItemId}) | Rented: {rentalItem.QuantityRented} | Returned: {rentalItem.QuantityReturned} | Still Out: {stillOut} | Price/Day: ${rentalItem.PricePerDayAtTimeOfRental}");
+                    }
+                }
+            }
 
             return sb.ToString();
         }
         catch
         {
-            // Fallback: still enforce non-fabrication even if context fetch fails
-            return $"{SystemPrompt}\nRULE: If you lack data, say so. Do not fabricate details.";
+            return SystemPrompt;
         }
     }
 

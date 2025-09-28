@@ -1,44 +1,34 @@
-<div class="page-header">
-    <h1>AI Assistant</h1>
-    <p class="text-muted">Hey! I'm your AI Assistant. What can I help you find or prep for an event today?</p>
-</div>
+<h2>AI Assistant</h2>
+<p>Ask me about items, events, or rentals.</p>
 
-<div class="row g-3">
-    <div class="col-lg-8">
-        <div class="card chat-card">
-            <div class="card-body chat-window" id="chat-window">
-                @if (!_messages.Any())
-                {
-                    <div class="empty-state">
-                        <p>Ask me about items, availability, events, or rentals. I respond fast and keep it simple.</p>
-                    </div>
-                }
-                else
-                {
-                    @foreach (var m in _messages)
-                    {
-                        <div class="chat-row @(m.FromUser ? "user" : "bot")">
-                            <div class="avatar">
-                                <i class="fas @(m.FromUser ? "fa-user" : "fa-robot")"></i>
-                            </div>
-                            <div class="bubble">
-                                <div class="meta">
-                                    <span class="name">@(m.FromUser ? "You" : "Assistant")</span>
-                                    <span class="time">@m.At.ToString("HH:mm")</span>
-                                </div>
-                                <div class="text">@m.Text</div>
-                            </div>
+<div class="chat-card">
+    <div class="chat-window">
+        @if (!_messages.Any())
+        {
+            <div class="empty-state">
+                <p>Start a conversation...</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var m in _messages)
+            {
+                <div class="chat-row @(m.FromUser ? "user" : "bot")">
+                    <div class="bubble">
+                        <div class="meta">
+                            @(m.FromUser ? "You" : "AI") - @m.At.ToString("HH:mm")
                         </div>
-                    }
-                }
-            </div>
-            <div class="card-footer d-flex align-items-center">
-                <input class="form-control me-2" placeholder="Type your question..." @bind="_draft"
-                       @bind:event="oninput" @onkeydown="HandleKeyDown"/>
-                <button class="btn btn-primary" @onclick="Send">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
+                        <div class="text">@m.Text</div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <div style="padding: 10px; border-top: 1px solid #ddd;">
+        <input type="text" placeholder="Type your message..." @bind="_draft" @onkeydown="HandleKeyDown" 
+               style="width: 80%; padding: 8px; border: 1px solid #ccc; border-radius: 3px;" />
+        <button @onclick="Send" style="padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 3px; margin-left: 5px;">
+            Send
+        </button>
     </div>
 </div>
