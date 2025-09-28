@@ -1,50 +1,92 @@
 # Event Inventory Manager
 
-A web application for managing inventory and equipment for event companies. This solution replaces the current Excel-based system, providing efficient tools for tracking equipment, managing rentals, and planning events.
+This project is for managing inventory and equipment for event companies. This solution replaces the current Excel-based system, providing efficient tools for tracking equipment, managing rentals, and planning events.
 
-## Features
+**Author:** Lukáš Hellesch
 
-### Inventory Management
-- Add, edit, and delete inventory items
-- Track item status and location
-- Export inventory to PDF for field work
+---
+The goal is to create inventory management system that allows users to monitor their warehouse items and help with the planning of the events and loading the trucks for each event. The system also helps with managing rentals.
 
-### Equipment Rental
-- Check-out and check-in equipment
-- Track rentals (who, what, return date)
-- View active rentals and due dates
+A visual representation of the inventory management interface:
+## **Dashboard Overview:**
+The dashboard provides overview with summary statistics. It displays active rentals/events and upcoming events, also there is an AI chatbot which can help with fast answering of questions
 
-### Event Planning
-- Create event checklists with required equipment
-- Automatic availability checking for items
-- Conflict detection for double-booked equipment
+![Dashboard Screenshot](docs/images/Dashboard.png)
 
-### Loading Optimization
-- Smart algorithm to sort items for loading (heaviest/largest first)
-- Optimized packing lists for events
-- Visual loading guide
-
-### AI Assistant (Planned)
-- Natural language queries (e.g., "Where is X?", "How many tables are available?")
-- Event setup suggestions
-- Equipment recommendations based on event type
+## **Events Management:**
+The events interface shows a clean list view with event cards displaying location, date, time, client information, and contact details. Each event has an "Add Items" button for inventory assignment. And inside that you can load the truck.
 
 
-## Getting Started
-
-### Prerequisites
-- .NET 8.0 SDK 
+![Events Management Screenshot](docs/images/EventList.png)
 
 
-### Installation
+
+![Events CalendarView Screenshot](docs/images/Calendar.png)
+You can also view events in a calendar interface, which supports drag-and-drop functionality for easy rescheduling. Additionally, new events can be created directly within the calendar view.
+
+
+## **Inventory Management:**
+The inventory page displays a complete table of warehouse equipment including tents, lighting, and other items. Each item shows quantity, category, availability status, rental status, and condition with clear visual indicators.
+
+
+![Inventory Management Screenshot](docs/images/Inventory.png)
+
+---
+
+
+## Main Features
+
+- Inventory Tracking 
+- Event Management 
+- Rental System 
+- Availability Status of items based on free stock
+- Search & Filter in Inventory or with the help of AI
+- Item Assignment to specific events
+- Tracking condition of the items 
+- AI chatbot
+- Organize and optimize the loading order of items for truck packing
+
+## Technologies
+
+* ASP.NET Core with Blazor – Web application framework for the user interface
+* SQLite – Lightweight, file-based database for data storage
+
+## Repository Structure
+
+```
+/DOCS
+    - user-guide.md
+    - developer-guide.md
+    - images/
+/src
+    - WarehouseManager.Core/    # Core business logic and entities
+    - WarehouseManager.Infrastructure/        # Database 
+    - WarehouseManager.Web/    # Web application|UI
+    - Warehousemanager.Application/ #Use cases
+```
+
+## To get started follow these instructions
+
 1. Clone the repository
-2. Restore NuGet packages
-3. Update the connection string in `appsettings.json`
-4. Run database migrations
-5. Start the application
+   
 
-## Project Structure
-- **WarehouseManager.Core**: Domain models and business logic
-- **WarehouseManager.Application**: Application services and use cases
-- **WarehouseManager.Infrastructure**: Data access and external services
-- **WarehouseManager.Web**: Web interface and API endpoints
+2. Navigate to the source directory
+
+
+3. You need to run following to update databaes in your pc locally
+   ```
+   dotnet ef database update --startup-project WarehouseManager.Web --project WarehouseManager.Infrastructure
+   ```
+
+4. Run the application with this command
+   ```
+   dotnet run --project WarehouseManager.Web
+   ```
+
+5. It should open automatically your web browser with the website (If not check the localhost: port on which it is running)
+
+## Documentation
+
+* [**User Guide**](DOCS/user-guide.md) – Instructions for using the inventory management system
+* [**Developer Guide**](DOCS/developer-guide.md) – Technical details for contributors and developers
+
