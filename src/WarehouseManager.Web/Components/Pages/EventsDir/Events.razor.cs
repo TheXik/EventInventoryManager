@@ -84,7 +84,6 @@ public partial class Events
     {
         try
         {
-            // Show confirmation dialog
             var confirmed = await JS.InvokeAsync<bool>("confirm", 
                 $"Are you sure you want to delete the event '{eventToDelete.Name}'? This will return all allocated items to inventory and cannot be undone.");
             if (!confirmed) return;
