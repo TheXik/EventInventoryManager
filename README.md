@@ -1,6 +1,6 @@
 # Event Inventory Manager
 
-This project is for managing inventory and equipment for event companies. This solution replaces the current Excel-based system, providing efficient tools for tracking equipment, managing rentals, and planning events.
+This project is for managing inventory and equipment for event companies. This solution replaces the current Excel-based system, providing efficient tools for tracking inventory items, managing rentals, and planning events.
 
 **Author:** Lukáš Hellesch
 
@@ -14,7 +14,7 @@ The dashboard provides overview with summary statistics. It displays active rent
 ![Dashboard Screenshot](docs/images/Dashboard.png)
 
 ## **Events Management:**
-The events interface shows a clean list view with event cards displaying location, date, time, client information, and contact details. Each event has an "Add Items" button for inventory assignment. And inside that you can load the truck.
+The events interface shows a clean list view with event cards displaying location, date, time, client information, and contact details. Each event has an "Add Items" button for inventory assignment and inside that you can load the truck.
 
 
 ![Events Management Screenshot](docs/images/EventList.png)
@@ -44,7 +44,7 @@ The inventory page displays a complete table of warehouse equipment including te
 - Item Assignment to specific events
 - Tracking condition of the items 
 - AI chatbot
-- Organize and optimize the loading order of items for truck packing
+- Organize and optimize the loading order of items for truck loading
 
 ## Technologies
 
@@ -73,7 +73,7 @@ The inventory page displays a complete table of warehouse equipment including te
 2. Navigate to the source directory
 
 
-3. You need to run following to update databaes in your pc locally
+3. You need to run following to update database in your pc locally
    ```
    dotnet ef database update --startup-project WarehouseManager.Web --project WarehouseManager.Infrastructure
    ```
