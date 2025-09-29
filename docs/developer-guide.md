@@ -10,14 +10,14 @@ Event Inventory Manager is a web-based warehouse management system built with AS
 - Inventory management with categories and conditions
 - Event planning with item allocation
 - Rental system with status tracking
-- AI-powered assistant for queries
+- AI-powered assistant for fast questions
 - Dashboard with statistics and basic overview
 
 ---
 
 ## Architecture
 
-The project follows Clean Architecture (or so called Onion architecture) principles with clear separation of concerns:
+The project follows Clean Architecture (or so called Onion architecture) principles with clear separation of concerns.
 
 
 
@@ -49,14 +49,8 @@ The project follows Clean Architecture (or so called Onion architecture) princip
 ---
 
 
-## Setup and Development
+## Setup and Development - Useful commands
 
-### Prerequisites
-- .NET 8.0 SDK
-- Visual Studio 2022 or VS Code
-- Git
-
-### Useful commands
 
 #### Update database 
 
