@@ -21,13 +21,13 @@ The main navigation menu (left sidebar) contains:
 
 ## Dashboard Overview
 
-The dashboard provides a comprehensive overview of your warehouse operations.
+The dashboard provides overview of your warehouse operations.
 
 - Key Statistics
 
 -  Active Rentals & Events
 
-- AI Assistant (you can ask questions about inventory events or rentals, if he cant answer he will not improvise or create fake information. At least that was the focus :D)
+- AI Assistant (you can ask questions about inventory events or rentals, if he cant answer he will not improvise or create fake information. At least that was the plan :D)
 
 
 ---

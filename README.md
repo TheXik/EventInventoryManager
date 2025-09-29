@@ -87,6 +87,14 @@ The inventory page displays a complete table of warehouse equipment including te
 
 ## Documentation
 
-* [**User Guide**](DOCS/user-guide.md) – Instructions for using the inventory management system
-* [**Developer Guide**](DOCS/developer-guide.md) – Technical details for contributors and developers
+* [User Guide](DOCS/user-guide.md) – Instructions for using the inventory management system
+* [Developer Guide](DOCS/developer-guide.md) – Technical details for contributors and developers
+
+
+## Future 
+* In future - My plan is to add features that you can plan and create events with the AI help he will store everything so you dont have to any many more new features with the AI. In all the event companies they are looking for some type of this AI solution that will help them with their operations.
+
+* Possibility of importing a lot of data/items from a list 
+
+* Importing / Syncing with google / apple calendar
 
