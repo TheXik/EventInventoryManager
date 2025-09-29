@@ -8,18 +8,39 @@ using WarehouseManager.Core.Enums;
 
 namespace WarehouseManager.Web.Components.Pages;
 
+/// <summary>
+/// AI-powered chatbot for warehouse management 
+/// Creates responses about inventory, events, and rentals based on data from the database. It uses Gemini from Google
+/// </summary>
 public partial class WarehouseCopilot
 {
+    /// <summary>
+    /// Instructs the AI to act as a warehouse assistant and use only provided data.
+    /// </summary>
     private const string SystemPrompt = "You are an AI assistant for a warehouse. Answer questions about inventory, events, and rentals using only the data provided. Use plain text only.";
+    
+    /// <summary>
+    /// Maintains the chat history for context
+    /// </summary>
     private readonly List<Message> _messages = new();
     private string _draft = string.Empty;
 
+    /// <summary>
+    /// AI service for interacting with the Gemini to generate responses
+    /// </summary>
     [Inject] private IChatAiService ChatAi { get; set; } = default!;
+    
+    // Injected repositories that hold the data
     [Inject] private IInventoryItemRepository InventoryRepo { get; set; } = default!;
     [Inject] private IEventRepository EventRepo { get; set; } = default!;
     [Inject] private IRentalRepository RentalRepo { get; set; } = default!;
 
 
+    /// <summary>
+    /// Handles sending a message to the AI assistant.
+    /// Handles the user input, adds it to the conversation history,
+    /// builds context with current warehouse data and gets AI response
+    /// </summary>
     private async Task Send()
     {
         var text = _draft.Trim();
@@ -28,12 +49,19 @@ public partial class WarehouseCopilot
         _messages.Add(new Message(true, text, DateTime.Now));
         _draft = string.Empty;
 
+        // Build context with current warehouse data and get AI response
         var context = await BuildContextAsync();
         var reply = await ChatAi.AskAsync(context, _messages.Select(m => (m.FromUser, m.Text)), text);
+        
+        // Add AI response to conversation history and trigger UI update
         _messages.Add(new Message(false, reply, DateTime.Now));
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Triggers message sending when Enter key is pressed.
+    /// </summary>
+    /// <param name="e">Keyboard event arguments</param>
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter") await Send();
@@ -61,7 +89,7 @@ public partial class WarehouseCopilot
                 if (!string.IsNullOrWhiteSpace(item.RentalDescription))
                     sb.AppendLine($"  Rental Notes: {item.RentalDescription}");
             }
-
+            //Build events section
             sb.AppendLine();
             sb.AppendLine("EVENTS:");
             foreach (var evt in events)
@@ -80,6 +108,7 @@ public partial class WarehouseCopilot
                 }
             }
 
+            // Build rentals section 
             sb.AppendLine();
             sb.AppendLine("RENTALS:");
             foreach (var rental in rentals)
@@ -100,6 +129,8 @@ public partial class WarehouseCopilot
                     }
                 }
             }
+            
+            // Final instructions for AI behavior and response format
             sb.AppendLine();
             sb.AppendLine("IMPORTANT: Do not use any markdown formatting. Do not use asterisks for bolding or bullet points. Use plain text only. Explain reasoning briefly when helpful, highlight risks or gaps, and suggest next steps. Always ask a short clarifying or follow‑up question when appropriate to keep the conversation moving.");
             
